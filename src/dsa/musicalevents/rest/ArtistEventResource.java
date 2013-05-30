@@ -12,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -31,7 +32,7 @@ import dsa.musicalevents.rest.util.DataSourceSAP;
 public class ArtistEventResource {
 	// Recurso Event: ./artists/{artist}/events/{eventid}
 	// GET → Obtener evento. *
-	// PUT → Actualizar evento.
+	// PUT → Actualizar evento. *
 	// DELETE → Eliminar evento.
 	// id int(11) NOT NULL AUTO_INCREMENT,
 	// idkind int(11) NOT NULL,
@@ -57,6 +58,7 @@ public class ArtistEventResource {
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	// Al tener Produces, se le pasa el objeto Event por parámetro
 	public Response updateEventJson(@PathParam("eventid") int eventid,
 			Event event, @PathParam("artist") String artistname) {
 		// TODO método updateEvent
@@ -69,14 +71,31 @@ public class ArtistEventResource {
 			response = Response
 					.status(204)
 					.location(
-							new URI("/artists/" + event.getArtist() + "/events/"
-									+ event.getEventId())).build();
+							new URI("/artists/" + event.getArtist()
+									+ "/events/" + event.getEventId())).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 		return response;
 	}
-	
+
+	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteArtistJSON(@PathParam("eventid") int eventid,
+			@PathParam("artist") String artistname) {
+		// TODO deleteEvent method
+		deleteEvent(eventid, artistname);
+		return Response.status(204).build();
+	}
+
+	// @DELETE
+	// @Produces(MediaType.APPLICATION_JSON)
+	// public Response deleteArtistJSON(@PathParam("artist") String artistname)
+	// {
+	// deleteArtist(artistname);
+	// return Response.status(204).build();
+	// }
+
 	// @POST
 	// @Consumes(MediaType.APPLICATION_JSON)
 	// @Produces(MediaType.APPLICATION_JSON)
