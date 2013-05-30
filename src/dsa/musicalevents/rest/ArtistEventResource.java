@@ -47,11 +47,13 @@ public class ArtistEventResource {
 	@Context
 	protected HttpServletRequest request;
 
+	@Context
+	private SecurityContext security;
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Event getEventJSON(@PathParam("eventid") int eventid,
 			@PathParam("artist") String artistname) {
-		// TODO hacer método getEvent
 		return getEvent(eventid, artistname);
 	}
 
@@ -135,6 +137,38 @@ public class ArtistEventResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
+
+	public void updateEvent(int eventid, Event event, String artistname) {
+		if (security.isUserInRole("admin")) {
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.SERVICE_UNAVAILABLE)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+			try {
+				Statement stmt = connection.createStatement();
+				// Solo podemos modificar el place
+				// TODO  
+				System.out.println("consulta");
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			}
+		}
+	}
+
 	// @POST
 	// @Consumes(MediaType.APPLICATION_JSON)
 	// @Produces(MediaType.APPLICATION_JSON)
