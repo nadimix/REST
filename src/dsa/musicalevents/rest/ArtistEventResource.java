@@ -88,14 +88,53 @@ public class ArtistEventResource {
 		return Response.status(204).build();
 	}
 
-	// @DELETE
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public Response deleteArtistJSON(@PathParam("artist") String artistname)
-	// {
-	// deleteArtist(artistname);
-	// return Response.status(204).build();
-	// }
+	public Event getEvent(int eventid, String artistname) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
 
+		try {
+			Statement stmt = connection.createStatement();
+			// TODO poner query que permita obtener un artistid, id event,
+			// idkind, place, city
+			ResultSet rs = stmt.executeQuery("query");
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
+			}
+
+			Event event = new Event();
+			event.setEventId(rs.getInt("id"));
+			event.setKindId(rs.getInt("idkind"));
+			event.setArtistId(rs.getInt("idartist"));
+			// TODO métodos que me pasen de idkind e idartist a sus respectivos
+			// strings.
+			// event.setArtist("artistname"));
+			// event.setKind("kind");
+			stmt.close();
+			connection.close();
+			return event;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
 	// @POST
 	// @Consumes(MediaType.APPLICATION_JSON)
 	// @Produces(MediaType.APPLICATION_JSON)

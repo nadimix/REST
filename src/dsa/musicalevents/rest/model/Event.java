@@ -9,6 +9,7 @@ public class Event {
 	private int eventId;
 	private int artistId;
 	private int userId;
+	private int kindId;
 	private String kind;
 	private String artist;
 	private String place;
@@ -87,6 +88,14 @@ public class Event {
 
 	public void setSamePlaceLink(String samePlaceLink) {
 		this.samePlaceLink = samePlaceLink;
+	}
+
+	public int getKindId() {
+		return kindId;
+	}
+
+	public void setKindId(int kindId) {
+		this.kindId = kindId;
 	}
 
 }
