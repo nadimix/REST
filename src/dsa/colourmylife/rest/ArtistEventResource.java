@@ -84,7 +84,6 @@ public class ArtistEventResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteArtistJSON(@PathParam("eventid") int eventid,
 			@PathParam("artist") String artistname) {
-		// TODO deleteEvent method
 		deleteEvent(eventid, artistname);
 		return Response.status(204).build();
 	}
@@ -191,25 +190,42 @@ public class ArtistEventResource {
 		}
 	}
 
-	// @POST
-	// @Consumes(MediaType.APPLICATION_JSON)
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public Response createEventJSON(Event event, String artistname) {
-	// // TODO Hacer método insertEvent
-	// insertEvent(event, artistname);
-	// // Le paso un evento y un artista (string) que al introducirlo en un
-	// // atributo del evento luego puedo obtenerlo invocándolo a partir del
-	// // event.getArtist
-	// Response response = null;
-	// try {
-	// response = Response
-	// .status(204)
-	// .location(
-	// new URI("/artists/" + event.getArtist()
-	// + "/events/" + event.getEventId())).build();
-	// } catch (URISyntaxException e) {
-	// e.printStackTrace();
-	// }
-	// return response;
-	// }
+	public void deleteEvent(int eventid, String artistname) {
+		if (security.isUserInRole("admin")) {
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.SERVICE_UNAVAILABLE)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+
+			try {
+				Statement stmt = connection.createStatement();
+				// TODO consulta borrar evento
+				int rs = stmt.executeUpdate("consulta");
+				if (rs == 0)
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"Event not found.", request)).build());
+				stmt.close();
+				connection.close();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			}
+		}
+	}	
 }
