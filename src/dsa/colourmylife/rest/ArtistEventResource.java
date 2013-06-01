@@ -154,8 +154,31 @@ public class ArtistEventResource {
 			try {
 				Statement stmt = connection.createStatement();
 				// podemos modificar date, place, city, country
-				// TODO  consulta
-				System.out.println("consulta");
+				// TODO consulta
+				StringBuilder sb = new StringBuilder("consulta");
+				if (event.getCity() == null || event.getCountry() == null) {
+					throw new WebApplicationException(
+							Response.status(Response.Status.BAD_REQUEST)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.BAD_REQUEST
+													.getStatusCode(),
+											"Country and City must not be NULL",
+											request)).build());
+				}
+				sb.append("terminar consulta");
+				System.out.println(sb);
+
+				int rs = stmt.executeUpdate(sb.toString());
+				if (rs == 0)
+					throw new WebApplicationException(
+							Response.status(Response.Status.NOT_FOUND)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.NOT_FOUND
+													.getStatusCode(),
+											"Problem Occurs Between Chair And Keyboard",
+											request)).build());
+				stmt.close();
+				connection.close();
 			} catch (SQLException e) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.INTERNAL_SERVER_ERROR)

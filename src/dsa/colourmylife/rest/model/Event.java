@@ -13,6 +13,8 @@ public class Event {
 	private String kind;
 	private String artist;
 	private String place;
+	private String city;
+	private String country;
 	private String date;
 	private String sameArtistLink;
 	private String samePlaceLink;
@@ -96,6 +98,22 @@ public class Event {
 
 	public void setKindId(int kindId) {
 		this.kindId = kindId;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
 }
