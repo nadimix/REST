@@ -108,6 +108,7 @@ public class ArtistResource {
 			artist.setName(rs.getString("name"));
 			artist.setGenreId(rs.getInt("idgenre1"));
 			artist.setGenre2Id(rs.getInt("idgenre2"));
+			artist.setInfo(rs.getString("info"));
 			// TODO OPTIONAL: Convert genreId into a genre, Maybe another stmt
 			// artist.setGenre("genre");
 			// artist.setGenre2("genre2");

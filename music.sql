@@ -150,6 +150,9 @@ INSERT INTO genre VALUES (NULL, "Classic");
 INSERT INTO genre VALUES (NULL, "Electronic");
 
 INSERT INTO event VALUES (NULL, 1, "Florence", "2013-09-20 22:00:00", "Palau Sant Jordi", "Barcelona", "Catalunya", "Awesome!", NOW());
+INSERT INTO event VALUES (NULL, 1, "Florence", "2013-09-21 22:00:00", "Palau Joventut", "Badalona", "Catalunya", "Awesome++!", NOW());
+INSERT INTO event VALUES (NULL, 1, "Daft Punk", "2013-09-21 22:45:00", "Palau Joventut", "Badalona", "Catalunya", "Awesome++!", NOW());
+
 
 INSERT INTO follow VALUES (NULL, 1, 1);
 INSERT INTO follow VALUES (NULL, 1, 2);
@@ -161,7 +164,7 @@ INSERT INTO follow VALUES (NULL, 4, 4);
 
 /* Another: working
 
-INSERT INTO artist VALUES (NULL, "Florence", 4, NULL, "Grupo imprescindible");
+INSERT INTO artist VALUES (NULL, 'Florence', 4, NULL, 'Grupo imprescindible');
 
 SELECT * FROM artist;
 
@@ -171,11 +174,15 @@ DELETE FROM artist WHERE name ='Florence';
 
 UPDATE artist SET info='Vocalist kissed by fire' WHERE name='Florence';
 
-INSERT INTO event VALUES (NULL, 1, "Florence", "2013-09-20 22:00:00", "Palau Sant Jordi", "Barcelona", "Catalunya", "Va a ser inolvidable", NOW());
+INSERT INTO event VALUES (NULL, 1, 'Florence', '2013-09-20 22:00:00', 'Palau Sant Jordi', 'Barcelona', 'Catalunya', 'Va a ser inolvidable', NOW());
 
 UPDATE event SET date='2014-09-20 22:00:00', place='Palau Joventut', city='Badalona', country='Catalunya', info='new Location' WHERE artist='Florence';
 
 SELECT * FROM event WHERE id = 1 AND artist = 'Florence';
+
+SELECT * FROM event WHERE artist='Florence';
+
+SELECT * FROM event WHERE artist='Florence' AND city='Badalona';
 
 DELETE FROM event WHERE id=2 and artist='Florence';
 
