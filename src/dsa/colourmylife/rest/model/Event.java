@@ -7,15 +7,18 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 public class Event {
 
 	private int eventId;
-	private int artistId;
-	private int userId;
 	private int kindId;
-	private String kind;
-	private String artist;
+	private int artistId;
+	private String date;
 	private String place;
 	private String city;
 	private String country;
-	private String date;
+	private String info;
+
+	// Hacer métodos que permitan obtener kind y artist a partir de sus Id aquí
+	// dentro?
+	private String kind;
+	private String artist;
 	private String sameArtistLink;
 	private String samePlaceLink;
 
@@ -34,14 +37,6 @@ public class Event {
 
 	public void setArtistId(int artistId) {
 		this.artistId = artistId;
-	}
-
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
 	}
 
 	public String getKind() {
@@ -114,6 +109,14 @@ public class Event {
 
 	public void setCountry(String country) {
 		this.country = country;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 }

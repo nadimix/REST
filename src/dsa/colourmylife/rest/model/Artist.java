@@ -3,9 +3,11 @@ package dsa.colourmylife.rest.model;
 public class Artist {
 
 	private int artistId;
+	private String name;
 	private int genreId;
 	private int genre2Id;
-	private String name;
+	private String info;
+	// Creamos método para obtener genres a partir de id?
 	private String genre;
 	private String genre2;
 
@@ -55,5 +57,13 @@ public class Artist {
 
 	public void setGenre2(String genre2) {
 		this.genre2 = genre2;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 }
