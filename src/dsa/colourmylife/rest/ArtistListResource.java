@@ -20,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 
 import dsa.colourmylife.rest.model.Artist;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
@@ -30,16 +31,24 @@ public class ArtistListResource {
 	// Recurso ArtistList: ./artists
 	// GET → Lista artistas.
 	// POST → Añadir artistas.
+	// id int(11) NOT NULL AUTO_INCREMENT,
+	// name varchar(50) NOT NULL,
+	// idgenre1 int(11) NOT NULL,
+	// idgenre2 int(11) NULL,
+	// info varchar(150),
+
+	@Context
+	private UriInfo uri;
 
 	@Context
 	protected HttpServletRequest request;
+
 	@Context
 	private SecurityContext security;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Artist> getArtistListJSON() {
-		// TODO método para obtener lista de Artistas
 		return getArtistList();
 	}
 
@@ -50,8 +59,11 @@ public class ArtistListResource {
 		insertArtist(artist);
 		Response response = null;
 		try {
-			response = Response.status(204)
-					.location(new URI("/artists" + artist.getName())).build();
+			response = Response
+					.status(204)
+					.location(
+							new URI(uri.getAbsolutePath().toString() + "/"
+									+ artist.getName())).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -59,86 +71,13 @@ public class ArtistListResource {
 	}
 
 	private void insertArtist(Artist artist) {
-		// Solo el Admin puede insertar Artistas
-		if (security.isUserInRole("admin")) {
-			Connection connection = null;
-			try {
-				connection = DataSourceSAP.getInstance().getDataSource()
-						.getConnection();
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.SERVICE_UNAVAILABLE)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.SERVICE_UNAVAILABLE
-										.getStatusCode(),
-								"Service unavailable.", request)).build());
-			}
-			try {
-				if (artist.getName() == null || artist.getGenre() == null) {
-					throw new WebApplicationException(
-							Response.status(Response.Status.BAD_REQUEST)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.BAD_REQUEST
-													.getStatusCode(),
-											"The Artist and first genre mustn't be empty",
-											request)).build());
-
-				}
-				if (getArtist(artist.getName()) != null) {
-					throw new WebApplicationException(Response
-							.status(Response.Status.CONFLICT)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.CONFLICT.getStatusCode(),
-									"Usuario ya existe", request)).build());
-
-				}
-				connection.setAutoCommit(false);
-				// Insertamos artista en la BD
-				try {
-					Statement stmt = connection.createStatement();
-					// TODO query para insertar nombre artista y géneros
-					// (considerar
-					// caso
-					// que hay 2 géneros en un if)
-					StringBuilder sb = new StringBuilder("query");
-					System.out.println(sb);
-					int rs = stmt.executeUpdate(sb.toString());
-					if (rs == 0)
-						throw new WebApplicationException(Response
-								.status(Response.Status.NOT_FOUND)
-								.entity(APIErrorBuilder.buildError(
-										Response.Status.NOT_FOUND
-												.getStatusCode(),
-										"Artist not found.", request)).build());
-					stmt.close();
-				} catch (SQLException e) {
-					throw new WebApplicationException(Response
-							.status(Response.Status.INTERNAL_SERVER_ERROR)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.INTERNAL_SERVER_ERROR
-											.getStatusCode(),
-									"Error accessing to database.", request))
-							.build());
-				}
-				connection.commit();
-			} catch (SQLException e) {
-				try {
-					connection.rollback();
-				} catch (Exception e2) {
-				}
-			} finally {
-				try {
-					connection.setAutoCommit(true);
-					connection.close();
-				} catch (Exception e2) {
-				}
-			}
+		if (!security.isUserInRole("admin")) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
 		}
-	}
-
-	// TODO preguntar a Sergio cómo utilizar esta clase desde fuera, para no
-	// repetirla
-	public Artist getArtist(String artistname) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -153,37 +92,67 @@ public class ArtistListResource {
 		}
 
 		try {
-			Statement stmt = connection.createStatement();
-			// TODO poner query que permita obtener artistid, artistname,
-			// idgenre1, idgendre2
-			ResultSet rs = stmt.executeQuery("query");
-			if (!rs.next()) {
+			if (artist.getName() == null || artist.getGenre() == null) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
+						.status(Response.Status.BAD_REQUEST)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
+								Response.Status.BAD_REQUEST.getStatusCode(),
+								"The Artist and Genre camps mustn't be empty",
+								request)).build());
+
 			}
 
-			Artist artist = new Artist();
-			artist.setArtistid(rs.getInt("id"));
-			artist.setName(rs.getString("name"));
-			artist.setGenreId(rs.getInt("idgenre1"));
-			// TODO comprobar qué pasa si genre2Id no existe
-			artist.setGenre2Id(rs.getInt("idgenre2"));
-			// TODO hacer método que me pase la genreId a genre
-			// artist.setGenre("genre");
-			// artist.setGenre2("genre2");
-			stmt.close();
-			connection.close();
-			return artist;
+			if (getArtist(artist.getName()) != null) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.CONFLICT)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.CONFLICT.getStatusCode(),
+								"Artist already exists", request)).build());
+			}
+
+			connection.setAutoCommit(false);
+			// Insertamos artista en la BD
+			try {
+				Statement stmt = connection.createStatement();
+				// INSERT INTO artist VALUES (NULL, "Florence", 4, NULL,
+				// "Grupo imprescindible");
+				StringBuilder sb = new StringBuilder(
+						"INSERT INTO artist VALUES (NULL, '" + artist.getName()
+								+ "', " + artist.getGenreId() + ", "
+								+ artist.getGenre2Id() + ", '"
+								+ artist.getInfo() + "');");
+				System.out.println(sb);
+				int rs = stmt.executeUpdate(sb.toString());
+				if (rs == 0)
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"Artist not found.", request)).build());
+				stmt.close();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			}
+			connection.commit();
 		} catch (SQLException e) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(),
-							"Error accessing to database.", request)).build());
+			try {
+				connection.rollback();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		} finally {
+			try {
+				connection.setAutoCommit(true);
+				connection.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
 		}
 	}
 
@@ -202,17 +171,18 @@ public class ArtistListResource {
 		}
 		try {
 			Statement stmt = connection.createStatement();
-			// TODO query que me de la lista de Artistas
-			ResultSet rs = stmt.executeQuery("query");
+			ResultSet rs = stmt.executeQuery("SELECT * FROM artist;");
 			List<Artist> artistList = new ArrayList<>();
+
 			while (rs.next()) {
 				Artist artist = new Artist();
 				artist.setArtistid(rs.getInt("id"));
 				artist.setName(rs.getString("name"));
 				artist.setGenreId(rs.getInt("idgenre1"));
-				// TODO comprobar qué pasa si genre2Id no existe
 				artist.setGenre2Id(rs.getInt("idgenre2"));
-				// TODO hacer método que me pase la genreId a genre
+				artist.setInfo(rs.getString("info"));
+				// TODO OPTIONAL: Convert genreId into a genre, podría ser otro
+				// stmt
 				// artist.setGenre("genre");
 				// artist.setGenre2("genre2");
 				artistList.add(artist);
@@ -228,7 +198,55 @@ public class ArtistListResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
-
 	}
 
+	public Artist getArtist(String name) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM artist WHERE name='Florence';
+			ResultSet rs = stmt
+					.executeQuery("SELECT * FROM artist WHERE name = '" + name
+							+ "';");
+
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
+			}
+
+			Artist artist = new Artist();
+			artist.setArtistid(rs.getInt("id"));
+			artist.setName(rs.getString("name"));
+			artist.setGenreId(rs.getInt("idgenre1"));
+			artist.setGenre2Id(rs.getInt("idgenre2"));
+			// TODO OPTIONAL: Convert genreId into a genre, podría ser otro stmt
+			// artist.setGenre("genre");
+			// artist.setGenre2("genre2");
+			stmt.close();
+			connection.close();
+			return artist;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
 }

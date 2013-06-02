@@ -90,8 +90,7 @@ public class ArtistResource {
 
 		try {
 			Statement stmt = connection.createStatement();
-			// INSERT INTO artist VALUES (NULL, "Florence", 4, NULL,
-			// "Grupo imprescindible");
+			// SELECT * FROM artist WHERE name='Florence';
 			ResultSet rs = stmt
 					.executeQuery("SELECT * FROM artist WHERE name = '" + name
 							+ "';");
@@ -108,11 +107,8 @@ public class ArtistResource {
 			artist.setArtistid(rs.getInt("id"));
 			artist.setName(rs.getString("name"));
 			artist.setGenreId(rs.getInt("idgenre1"));
-			// TODO Check what happens if idgenre2 not exists
-			if (rs.getInt("idgenre2") != 0) {
-				artist.setGenre2Id(rs.getInt("idgenre2"));
-			}
-			// TODO OPTIONAL: Convert genreId into a genre
+			artist.setGenre2Id(rs.getInt("idgenre2"));			
+			// TODO OPTIONAL: Convert genreId into a genre, podría ser otro stmt
 			// artist.setGenre("genre");
 			// artist.setGenre2("genre2");
 			stmt.close();
