@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -23,7 +22,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
-import dsa.colourmylife.rest.model.Artist;
 import dsa.colourmylife.rest.model.Event;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
 import dsa.colourmylife.rest.util.DataSourceSAP;
@@ -36,10 +34,13 @@ public class ArtistEventResource {
 	// DELETE → Eliminar evento.
 	// id int(11) NOT NULL AUTO_INCREMENT,
 	// idkind int(11) NOT NULL,
-	// idartist int(11) NOT NULL,
+	// artist varchar(50) NOT NULL,
 	// date datetime default NULL,
-	// place varchar(128) NOT NULL,
+	// place varchar(128) NULL,
 	// city varchar(50) NOT NULL,
+	// country varchar(50) NOT NULL,
+	// info varchar(150),
+	// insertdate datetime default current_timestamp,
 
 	@Context
 	private UriInfo uri;
@@ -52,18 +53,18 @@ public class ArtistEventResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
+	// Entiendo que para hacer un GET basta con especificar el eventid
 	public Event getEventJSON(@PathParam("eventid") int eventid,
-			@PathParam("artist") String artistname) {
-		return getEvent(eventid, artistname);
+			@PathParam("artist") String name) {
+		return getEvent(eventid, name);
 	}
 
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	// Al tener Produces, se le pasa el objeto Event por parámetro
 	public Response updateEventJson(@PathParam("eventid") int eventid,
-			Event event, @PathParam("artist") String artistname) {
-		updateEvent(eventid, event, artistname);
+			Event event, @PathParam("artist") String name) {
+		updateEvent(eventid, event, name);
 		// Le paso un evento y un artista (string) que al introducirlo en un
 		// atributo del evento luego puedo obtenerlo invocándolo a partir del
 		// event.getArtist
@@ -82,13 +83,14 @@ public class ArtistEventResource {
 
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
+	// Entiendo que para eliminar un evento basta con el eventid
 	public Response deleteArtistJSON(@PathParam("eventid") int eventid,
-			@PathParam("artist") String artistname) {
-		deleteEvent(eventid, artistname);
+			@PathParam("artist") String name) {
+		deleteEvent(eventid, name);
 		return Response.status(204).build();
 	}
 
-	public Event getEvent(int eventid, String artistname) {
+	public Event getEvent(int eventid, String name) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -104,27 +106,38 @@ public class ArtistEventResource {
 
 		try {
 			Statement stmt = connection.createStatement();
-			// TODO poner query que permita obtener un artistid, id event,
-			// idkind, place, city
-			ResultSet rs = stmt.executeQuery("query");
+			// select * from event where id = 1 and artist = "Florence";
+			ResultSet rs = stmt.executeQuery("SELECT * FROM event WHERE id="
+					+ eventid + " and artist='" + name + "';");
 			if (!rs.next()) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
+								"NOT FOUND", request)).build());
 			}
 
 			Event event = new Event();
 			event.setEventId(rs.getInt("id"));
 			event.setKindId(rs.getInt("idkind"));
-			event.setArtistId(rs.getInt("idartist"));
-			// TODO métodos que me pasen de idkind e idartist a sus respectivos
-			// strings.
-			// event.setArtist("artistname"));
+			event.setArtist(rs.getString("artist"));
+			event.setDate(rs.getString("date"));
+			event.setPlace(rs.getString("place"));
+			event.setCity(rs.getString("city"));
+			event.setCountry(rs.getString("country"));
+			event.setInfo(rs.getString("info"));
+			event.setInsertdate(rs.getString("insertdate"));
+			event.setLink(uri.getAbsolutePath().toString());
+			// @Path("/artists/{artist}/events/{eventid}")
+			event.setSameKindLink(uri.getBaseUri().toString() + "/artists/"
+					+ name + "/events?idkind=" + event.getKindId());
+			event.setSameCountryLink(uri.getBaseUri().toString() + "/artists/"
+					+ name + "/events?country=" + event.getCountry());
+			// TODO OPTIONAL: Convert kindid into a kind, Maybe another stmt
 			// event.setKind("kind");
 			stmt.close();
 			connection.close();
+
 			return event;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
@@ -136,96 +149,104 @@ public class ArtistEventResource {
 		}
 	}
 
-	public void updateEvent(int eventid, Event event, String artistname) {
-		if (security.isUserInRole("admin")) {
-			Connection connection = null;
-			try {
-				connection = DataSourceSAP.getInstance().getDataSource()
-						.getConnection();
-			} catch (SQLException e) {
+	public void updateEvent(int eventid, Event event, String name) {
+		if (!security.isUserInRole("admin")) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
+		}
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			if (event.getCountry() == null) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.SERVICE_UNAVAILABLE)
+						.status(Response.Status.BAD_REQUEST)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.SERVICE_UNAVAILABLE
-										.getStatusCode(),
-								"Service unavailable.", request)).build());
-			}
-			try {
-				Statement stmt = connection.createStatement();
-				// podemos modificar date, place, city, country
-				// TODO consulta
-				StringBuilder sb = new StringBuilder("consulta");
-				if (event.getCity() == null || event.getCountry() == null) {
-					throw new WebApplicationException(
-							Response.status(Response.Status.BAD_REQUEST)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.BAD_REQUEST
-													.getStatusCode(),
-											"Country and City must not be NULL",
-											request)).build());
-				}
-				sb.append("terminar consulta");
-				System.out.println(sb);
-
-				int rs = stmt.executeUpdate(sb.toString());
-				if (rs == 0)
-					throw new WebApplicationException(
-							Response.status(Response.Status.NOT_FOUND)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.NOT_FOUND
-													.getStatusCode(),
-											"Problem Occurs Between Chair And Keyboard",
-											request)).build());
-				stmt.close();
-				connection.close();
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.INTERNAL_SERVER_ERROR
-										.getStatusCode(),
-								"Error accessing to database.", request))
+								Response.Status.BAD_REQUEST.getStatusCode(),
+								"Country camp mustn't be empty", request))
 						.build());
 			}
+			// UPDATE event SET date='2014-09-20 22:00:00', place='Palau
+			// Joventut', city='Badalona', country='Catalunya', info='new
+			// Location' WHERE artist='Florence';
+			StringBuilder sb = new StringBuilder("UPDATE event SET date='"
+					+ event.getDate() + "', place='" + event.getPlace()
+					+ "', city='" + event.getCity() + "', country='"
+					+ event.getCountry() + "', info='" + event.getInfo()
+					+ "' WHERE artist='" + name + "';");
+			System.out.println(sb);
+
+			int rs = stmt.executeUpdate(sb.toString());
+			if (rs == 0)
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Event NOT FOUND", request)).build());
+			stmt.close();
+			connection.close();
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
 		}
 	}
 
-	public void deleteEvent(int eventid, String artistname) {
-		if (security.isUserInRole("admin")) {
-			Connection connection = null;
-			try {
-				connection = DataSourceSAP.getInstance().getDataSource()
-						.getConnection();
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.SERVICE_UNAVAILABLE)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.SERVICE_UNAVAILABLE
-										.getStatusCode(),
-								"Service unavailable.", request)).build());
-			}
-
-			try {
-				Statement stmt = connection.createStatement();
-				// TODO consulta borrar evento
-				int rs = stmt.executeUpdate("consulta");
-				if (rs == 0)
-					throw new WebApplicationException(Response
-							.status(Response.Status.NOT_FOUND)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.NOT_FOUND.getStatusCode(),
-									"Event not found.", request)).build());
-				stmt.close();
-				connection.close();
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.INTERNAL_SERVER_ERROR
-										.getStatusCode(),
-								"Error accessing to database.", request))
-						.build());
-			}
+	public void deleteEvent(int eventid, String name) {
+		if (!security.isUserInRole("admin")) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
 		}
-	}	
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			// DELETE FROM event WHERE id=2 and artist='Florence';
+			int rs = stmt.executeUpdate("DELETE FROM event WHERE id="+eventid+" and artist='"+name+"';");
+			if (rs == 0)
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Event not found.", request)).build());
+			stmt.close();
+			connection.close();
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
 }

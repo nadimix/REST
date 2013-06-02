@@ -8,19 +8,20 @@ public class Event {
 
 	private int eventId;
 	private int kindId;
-	private int artistId;
+	private String artist;
 	private String date;
 	private String place;
 	private String city;
 	private String country;
 	private String info;
+	private String insertdate;
 
 	// Hacer métodos que permitan obtener kind y artist a partir de sus Id aquí
 	// dentro?
 	private String kind;
-	private String artist;
-	private String sameArtistLink;
-	private String samePlaceLink;
+	private String link;
+	private String sameCountryLink;
+	private String sameKindLink;
 
 	// POJO
 	public int getEventId() {
@@ -29,14 +30,6 @@ public class Event {
 
 	public void setEventId(int eventId) {
 		this.eventId = eventId;
-	}
-
-	public int getArtistId() {
-		return artistId;
-	}
-
-	public void setArtistId(int artistId) {
-		this.artistId = artistId;
 	}
 
 	public String getKind() {
@@ -71,22 +64,6 @@ public class Event {
 		this.date = date;
 	}
 
-	public String getSameArtistLink() {
-		return sameArtistLink;
-	}
-
-	public void setSameArtistLink(String sameArtistLink) {
-		this.sameArtistLink = sameArtistLink;
-	}
-
-	public String getSamePlaceLink() {
-		return samePlaceLink;
-	}
-
-	public void setSamePlaceLink(String samePlaceLink) {
-		this.samePlaceLink = samePlaceLink;
-	}
-
 	public int getKindId() {
 		return kindId;
 	}
@@ -117,6 +94,38 @@ public class Event {
 
 	public void setInfo(String info) {
 		this.info = info;
+	}
+
+	public String getSameKindLink() {
+		return sameKindLink;
+	}
+
+	public void setSameKindLink(String sameKindLink) {
+		this.sameKindLink = sameKindLink;
+	}
+
+	public String getInsertdate() {
+		return insertdate;
+	}
+
+	public void setInsertdate(String insertdate) {
+		this.insertdate = insertdate;
+	}
+
+	public String getLink() {
+		return link;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
+	}
+
+	public String getSameCountryLink() {
+		return sameCountryLink;
+	}
+
+	public void setSameCountryLink(String sameCountryLink) {
+		this.sameCountryLink = sameCountryLink;
 	}
 
 }
