@@ -14,7 +14,7 @@ public class DataSourceSAP {
 			// Get DataSource
 			Context initContext = new InitialContext();
 			Context envContext = (Context) initContext.lookup("java:/comp/env");
-			dataSource = (DataSource) envContext.lookup("jdbc/Musica");
+			dataSource = (DataSource) envContext.lookup("jdbc/music");
 
 		} catch (NamingException e) {
 			e.printStackTrace();

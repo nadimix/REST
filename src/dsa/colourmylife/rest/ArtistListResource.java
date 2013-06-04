@@ -62,7 +62,7 @@ public class ArtistListResource {
 			response = Response
 					.status(204)
 					.location(
-							new URI(uri.getAbsolutePath().toString() + "/"
+							new URI("/artist"
 									+ artist.getName())).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();

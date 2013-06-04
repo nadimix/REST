@@ -1,9 +1,9 @@
-DROP DATABASE IF EXISTS Music;
-CREATE DATABASE Music;
-GRANT ALL PRIVILEGES ON Music.* to 'music'@'localhost';
+DROP DATABASE IF EXISTS music;
+CREATE DATABASE music;
+GRANT ALL PRIVILEGES ON music.* to 'music'@'localhost';
 
 
-USE Music;
+USE music;
 DROP TABLE IF EXISTS user;
 CREATE TABLE user (
 id int(11) NOT NULL AUTO_INCREMENT,
