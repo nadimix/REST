@@ -14,6 +14,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -51,8 +52,7 @@ public class ArtistEventListResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Event> getEventListJSON(
-			@QueryParam("artist") String artistname,
+	public List<Event> getEventListJSON(@PathParam("artist") String artistname,
 			@QueryParam("city") String city) {
 		// All of this are Not NULL
 		return getEventList(artistname, city);
@@ -93,15 +93,15 @@ public class ArtistEventListResource {
 		try {
 			Statement stmt = connection.createStatement();
 			StringBuilder sb = null;
-			if (artist != null && city != null) {
-				throw new WebApplicationException(
-						Response.status(Response.Status.BAD_REQUEST)
-								.entity(APIErrorBuilder.buildError(
-										Response.Status.BAD_REQUEST
-												.getStatusCode(),
-										"Can't list events for artist and city at the same time.",
-										request)).build());
-			}
+			// if (artist != null && city != null) {
+			// throw new WebApplicationException(
+			// Response.status(Response.Status.BAD_REQUEST)
+			// .entity(APIErrorBuilder.buildError(
+			// Response.Status.BAD_REQUEST
+			// .getStatusCode(),
+			// "Can't list events for artist and city at the same time.",
+			// request)).build());
+			// }
 			if (city == null) {
 				// SELECT * FROM event WHERE artist='Florence';
 				sb = new StringBuilder("SELECT * FROM event WHERE artist='"
@@ -112,7 +112,8 @@ public class ArtistEventListResource {
 				// city='Badalona';
 				sb = new StringBuilder("SELECT * FROM event WHERE artist='"
 						+ artist + "' AND city='" + city + "';");
-			} else {
+			}
+			if (artist == null && city == null) {
 				// SELECT * FROM event;
 				sb = new StringBuilder("SELECT * FROM event;");
 			}
@@ -131,10 +132,10 @@ public class ArtistEventListResource {
 				event.setInsertdate(rs.getString("insertdate"));
 				event.setLink(uri.getAbsolutePath().toString());
 				// @Path("/artists/{artist}/events/{eventid}")
-				event.setSameKindLink(uri.getBaseUri().toString() + "/artists/"
+				event.setSameKindLink(uri.getBaseUri().toString() + "artists/"
 						+ artist + "/events?idkind=" + event.getKindId());
 				event.setSameCountryLink(uri.getBaseUri().toString()
-						+ "/artists/" + artist + "/events?country="
+						+ "artists/" + artist + "/events?country="
 						+ event.getCountry());
 				artistEventList.add(event);
 			}

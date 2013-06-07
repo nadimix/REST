@@ -59,11 +59,8 @@ public class ArtistListResource {
 		insertArtist(artist);
 		Response response = null;
 		try {
-			response = Response
-					.status(204)
-					.location(
-							new URI("/artist"
-									+ artist.getName())).build();
+			response = Response.status(204)
+					.location(new URI("/artist" + artist.getName())).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -71,6 +68,7 @@ public class ArtistListResource {
 	}
 
 	private void insertArtist(Artist artist) {
+		// System.out.println(security.getUserPrincipal().getName());
 		if (!security.isUserInRole("admin")) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.FORBIDDEN)
@@ -172,8 +170,9 @@ public class ArtistListResource {
 		try {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM artist;");
+			// SELECT name FROM genre WHERE id=(SELECT idgenre1 FROM artist
+			// WHERE id=1);
 			List<Artist> artistList = new ArrayList<>();
-
 			while (rs.next()) {
 				Artist artist = new Artist();
 				artist.setArtistid(rs.getInt("id"));
@@ -181,10 +180,12 @@ public class ArtistListResource {
 				artist.setGenreId(rs.getInt("idgenre1"));
 				artist.setGenre2Id(rs.getInt("idgenre2"));
 				artist.setInfo(rs.getString("info"));
-				// TODO OPTIONAL: Convert genreId into a genre, podría ser otro
-				// stmt
-				// artist.setGenre("genre");
-				// artist.setGenre2("genre2");
+				String genre1 = obtainGenre(artist.getGenreId());
+				artist.setGenre(genre1);
+				if (artist.getGenre2Id() != 0) {
+					String genre2 = obtainGenre(artist.getGenre2Id());
+					artist.setGenre2(genre2);
+				}
 				artistList.add(artist);
 			}
 			stmt.close();
@@ -200,7 +201,7 @@ public class ArtistListResource {
 		}
 	}
 
-	public Artist getArtist(String name) {
+	private Artist getArtist(String name) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -220,7 +221,6 @@ public class ArtistListResource {
 			ResultSet rs = stmt
 					.executeQuery("SELECT * FROM artist WHERE name = '" + name
 							+ "';");
-
 			if (!rs.next()) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
@@ -234,11 +234,14 @@ public class ArtistListResource {
 			artist.setName(rs.getString("name"));
 			artist.setGenreId(rs.getInt("idgenre1"));
 			artist.setGenre2Id(rs.getInt("idgenre2"));
-			// TODO OPTIONAL: Convert genreId into a genre, podría ser otro stmt
-			// artist.setGenre("genre");
-			// artist.setGenre2("genre2");
 			stmt.close();
 			connection.close();
+			String genre1 = obtainGenre(artist.getGenreId());
+			artist.setGenre(genre1);
+			if (artist.getGenre2Id() != 0) {
+				String genre2 = obtainGenre(artist.getGenre2Id());
+				artist.setGenre2(genre2);
+			}
 			return artist;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
@@ -248,5 +251,47 @@ public class ArtistListResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
+	}
+
+	public String obtainGenre(int genreid) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT name FROM genre WHERE id=1;
+			ResultSet rs = stmt.executeQuery("SELECT name FROM genre WHERE id="
+					+ genreid + ";");
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Genre not found.", request)).build());
+			}
+			String genre = rs.getString("name");
+			System.out.println(genre);
+			stmt.close();
+			connection.close();
+			return genre;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+
 	}
 }

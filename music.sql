@@ -174,6 +174,8 @@ DELETE FROM artist WHERE name ='Florence';
 
 UPDATE artist SET info='Vocalist kissed by fire' WHERE name='Florence';
 
+UPDATE user SET password='admin' WHERE name='admin';
+
 INSERT INTO event VALUES (NULL, 1, 'Florence', '2013-09-20 22:00:00', 'Palau Sant Jordi', 'Barcelona', 'Catalunya', 'Va a ser inolvidable', NOW());
 
 UPDATE event SET date='2014-09-20 22:00:00', place='Palau Joventut', city='Badalona', country='Catalunya', info='new Location' WHERE artist='Florence';
@@ -185,6 +187,10 @@ SELECT * FROM event WHERE artist='Florence';
 SELECT * FROM event WHERE artist='Florence' AND city='Badalona';
 
 DELETE FROM event WHERE id=2 and artist='Florence';
+
+SELECT name FROM genre WHERE id=(SELECT idgenre1 FROM artist WHERE id=1);
+
+SELECT name FROM genre WHERE id=1;
 
 */
 

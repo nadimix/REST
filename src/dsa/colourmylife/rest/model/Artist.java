@@ -7,7 +7,6 @@ public class Artist {
 	private int genreId;
 	private int genre2Id;
 	private String info;
-	// Creamos método para obtener genres a partir de id?
 	private String genre;
 	private String genre2;
 

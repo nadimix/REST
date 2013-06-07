@@ -61,7 +61,6 @@ public class ArtistResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateArtistJSON(@PathParam("artist") String name,
 			Artist artist) {
-		// TODO updateArtist;
 		updateArtist(name, artist);
 		Response response = null;
 		// Podemos cambiar solo el apartado info
@@ -94,7 +93,6 @@ public class ArtistResource {
 			ResultSet rs = stmt
 					.executeQuery("SELECT * FROM artist WHERE name = '" + name
 							+ "';");
-
 			if (!rs.next()) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
@@ -109,11 +107,15 @@ public class ArtistResource {
 			artist.setGenreId(rs.getInt("idgenre1"));
 			artist.setGenre2Id(rs.getInt("idgenre2"));
 			artist.setInfo(rs.getString("info"));
-			// TODO OPTIONAL: Convert genreId into a genre, Maybe another stmt
-			// artist.setGenre("genre");
-			// artist.setGenre2("genre2");
 			stmt.close();
 			connection.close();
+			String genre1 = obtainGenre(artist.getGenreId());
+			artist.setGenre(genre1);
+			// Genre2 can be null
+			if (artist.getGenre2Id() != 0) {
+				String genre2 = obtainGenre(artist.getGenre2Id());
+				artist.setGenre2(genre2);
+			}
 			return artist;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
@@ -218,6 +220,48 @@ public class ArtistResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
+	}
+
+	public String obtainGenre(int genreid) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT name FROM genre WHERE id=1;
+			ResultSet rs = stmt.executeQuery("SELECT name FROM genre WHERE id="
+					+ genreid + ";");
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Genre not found.", request)).build());
+			}
+			String genre = rs.getString("name");
+			System.out.println(genre);
+			stmt.close();
+			connection.close();
+			return genre;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
 
 	}
+
 }

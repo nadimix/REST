@@ -17,7 +17,7 @@ public class APIErrorBuilder {
 		APIError error = new APIError();
 		error.setErrorCode(errorCode);
 		error.setErrorMessage(errorMessage);
-		if (request.getHeader("Accept").equals(MediaType.APPLICATION_XML)) {
+		if (request.getHeader("Accept").equals(MediaType.APPLICATION_JSON)) {
 			return new JAXBElement<APIError>(new QName("error"),
 					APIError.class, error);
 		}
