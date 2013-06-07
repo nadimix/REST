@@ -90,13 +90,15 @@ public class ArtistListResource {
 		}
 
 		try {
-			if (artist.getName() == null || artist.getGenre() == null) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.BAD_REQUEST)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.BAD_REQUEST.getStatusCode(),
-								"The Artist and Genre camps mustn't be empty",
-								request)).build());
+			if (artist.getName() == null || artist.getGenreId() == 0
+					|| artist.getInfo() == null) {
+				throw new WebApplicationException(
+						Response.status(Response.Status.BAD_REQUEST)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.BAD_REQUEST
+												.getStatusCode(),
+										"ArtistName, GenreId and Info camps mustn't be empty",
+										request)).build());
 
 			}
 
@@ -201,7 +203,7 @@ public class ArtistListResource {
 		}
 	}
 
-	private Artist getArtist(String name) {
+	public Artist getArtist(String name) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -222,26 +224,12 @@ public class ArtistListResource {
 					.executeQuery("SELECT * FROM artist WHERE name = '" + name
 							+ "';");
 			if (!rs.next()) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
+				return null;
 			}
-
 			Artist artist = new Artist();
-			artist.setArtistid(rs.getInt("id"));
 			artist.setName(rs.getString("name"));
-			artist.setGenreId(rs.getInt("idgenre1"));
-			artist.setGenre2Id(rs.getInt("idgenre2"));
 			stmt.close();
 			connection.close();
-			String genre1 = obtainGenre(artist.getGenreId());
-			artist.setGenre(genre1);
-			if (artist.getGenre2Id() != 0) {
-				String genre2 = obtainGenre(artist.getGenre2Id());
-				artist.setGenre2(genre2);
-			}
 			return artist;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response

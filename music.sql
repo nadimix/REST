@@ -86,7 +86,7 @@ CREATE TABLE artist (
   name varchar(50) NOT NULL,
   idgenre1 int(11) NOT NULL,
   idgenre2 int(11) NULL,
-  info varchar(150),
+  info varchar(150) NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
