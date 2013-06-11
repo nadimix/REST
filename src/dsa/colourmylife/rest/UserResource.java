@@ -263,13 +263,11 @@ public class UserResource {
 				|| security.isUserInRole("admin")) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
-				throw new WebApplicationException(
-						Response.status(Response.Status.FORBIDDEN)
-								.entity(APIErrorBuilder.buildError(
-										Response.Status.FORBIDDEN
-												.getStatusCode(),
-										"FORBIDDEN",
-										request)).build());
+				throw new WebApplicationException(Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.FORBIDDEN.getStatusCode(),
+								"FORBIDDEN", request)).build());
 			}
 			Connection connection = null;
 			try {
@@ -313,7 +311,7 @@ public class UserResource {
 										.getStatusCode(),
 								"Error accessing to database.", request))
 						.build());
-			
+
 			}
 		}
 		// This returns maybe cause problems
@@ -321,6 +319,21 @@ public class UserResource {
 	}
 
 	private User login(String username, String password) {
+		if (!security.isUserInRole("registered")) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
+		}
+		if (security.isUserInRole("registered")
+				&& !security.getUserPrincipal().getName().equals(username)) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
+		}
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -336,7 +349,6 @@ public class UserResource {
 		try {
 
 			// miramos si ese usuario esta registrado.
-
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt
 					.executeQuery("select * from user where username = '"
@@ -350,10 +362,11 @@ public class UserResource {
 				user.setEmail(rs.getString("email"));
 				user.setName(rs.getString("name"));
 
-				// Comprobamos que el nombre de usuario y la contraseña sean las
+				// Comprobamos que el nombre de usuario y la contraseña sean
+				// las
 				// correctas.
 				Statement stmt1 = connection.createStatement();
-				//TODO modify query in order to check username too
+				// TODO modify query in order to check username too
 				StringBuilder sb = new StringBuilder(
 						"select username from user where password =MD5('"
 								+ password + "')");
@@ -450,8 +463,7 @@ public class UserResource {
 							Response.Status.INTERNAL_SERVER_ERROR
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
+
 		}
-
 	}
-
 }
