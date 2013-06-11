@@ -366,9 +366,8 @@ public class UserResource {
 				// las
 				// correctas.
 				Statement stmt1 = connection.createStatement();
-				// TODO modify query in order to check username too
 				StringBuilder sb = new StringBuilder(
-						"select username from user where password =MD5('"
+						"select username from user where username='"+user.getUsername()+"' and password =MD5('"
 								+ password + "')");
 				ResultSet rs1 = stmt1.executeQuery(sb.toString());
 
