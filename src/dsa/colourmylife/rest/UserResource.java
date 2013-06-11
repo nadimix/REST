@@ -259,56 +259,65 @@ public class UserResource {
 	}
 
 	private User getUser(String username) {
-		if (!security.isUserInRole("admin")) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.FORBIDDEN)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.FORBIDDEN.getStatusCode(),
-							"FORBIDDEN", request)).build());
-		}
-		Connection connection = null;
-		try {
-			connection = DataSourceSAP.getInstance().getDataSource()
-					.getConnection();
-		} catch (SQLException e) {
-			throw new WebApplicationException(
-					Response.status(Response.Status.SERVICE_UNAVAILABLE)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.SERVICE_UNAVAILABLE
-											.getStatusCode(),
-									"Service unavailable.", request)).build());
-		}
-
-		try {
-			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt
-					.executeQuery("select * from user where username = '"
-							+ username + "'");
-			if (!rs.next())
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			if (security.isUserInRole("registered")
+					&& !security.getUserPrincipal().getName().equals(username)) {
+				throw new WebApplicationException(
+						Response.status(Response.Status.FORBIDDEN)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.FORBIDDEN
+												.getStatusCode(),
+										"FORBIDDEN",
+										request)).build());
+			}
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
+						.status(Response.Status.SERVICE_UNAVAILABLE)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"User not found.", request)).build());
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
 
-			User user = new User();
-			user.setUserid(rs.getInt("id"));
-			user.setUsername(rs.getString("username"));
-			user.setPassword(rs.getString("password"));
-			user.setEmail(rs.getString("email"));
-			user.setName(rs.getString("name"));
-			stmt.close();
-			connection.close();
+			try {
+				Statement stmt = connection.createStatement();
+				ResultSet rs = stmt
+						.executeQuery("select * from user where username = '"
+								+ username + "'");
+				if (!rs.next())
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"User not found.", request)).build());
 
-			return user;
-		} catch (SQLException e) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(),
-							"Error accessing to database.", request)).build());
+				User user = new User();
+				user.setUserid(rs.getInt("id"));
+				user.setUsername(rs.getString("username"));
+				user.setPassword(rs.getString("password"));
+				user.setEmail(rs.getString("email"));
+				user.setName(rs.getString("name"));
+				stmt.close();
+				connection.close();
+				return user;
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			
+			}
 		}
+		// This returns maybe cause problems
+		return null;
 	}
 
 	private User login(String username, String password) {
@@ -344,6 +353,7 @@ public class UserResource {
 				// Comprobamos que el nombre de usuario y la contraseña sean las
 				// correctas.
 				Statement stmt1 = connection.createStatement();
+				//TODO modify query in order to check username too
 				StringBuilder sb = new StringBuilder(
 						"select username from user where password =MD5('"
 								+ password + "')");
