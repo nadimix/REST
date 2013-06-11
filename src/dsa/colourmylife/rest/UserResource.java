@@ -259,7 +259,13 @@ public class UserResource {
 	}
 
 	private User getUser(String username) {
-
+		if (!security.isUserInRole("admin")) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
+		}
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()

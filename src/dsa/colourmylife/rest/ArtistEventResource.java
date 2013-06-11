@@ -182,6 +182,7 @@ public class ArtistEventResource {
 			// UPDATE event SET date='2014-09-20 22:00:00', place='Palau
 			// Joventut', city='Badalona', country='Catalunya', info='new
 			// Location' WHERE artist='Florence';
+			// TODO verificar campos NOT NULLs!!!!!
 			StringBuilder sb = new StringBuilder("UPDATE event SET date='"
 					+ event.getDate() + "', place='" + event.getPlace()
 					+ "', city='" + event.getCity() + "', country='"

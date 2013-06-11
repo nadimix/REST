@@ -30,7 +30,7 @@ public class UserListResource {
 
 	@Context
 	protected HttpServletRequest request;
-
+	
 	@Context
 	private SecurityContext security;
 	
@@ -77,7 +77,7 @@ public class UserListResource {
 			// Bad request: si el usuario no ha puesto uno de los campos.
 
 			if (user.getName() == null || user.getPassword() == null
-					|| user.getEmail() == null) {
+					|| user.getEmail() == null || user.getUsername()==null) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.BAD_REQUEST)
 						.entity(APIErrorBuilder.buildError(
