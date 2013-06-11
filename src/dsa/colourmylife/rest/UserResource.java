@@ -15,6 +15,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -34,8 +35,23 @@ public class UserResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public User getUserJSON(@PathParam("username") String username) {
-		return getUser(username);
+	public User getUserJSON(@PathParam("username") String username,
+			@QueryParam("password") String password,
+			@QueryParam("option") int option) {// ,int control) {
+		/*
+		 * control=1 nos piden toda la información de un usuario control=0 log
+		 * in
+		 */
+		if (option == 1) {
+			return getUser(username);
+		} else {
+
+			return login(username, password);
+		}
+
+		// System.out.println("username= "+username+" password ="+password);
+		// return followartist(username,password);
+
 	}
 
 	@DELETE
@@ -287,6 +303,139 @@ public class UserResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
+	}
+
+	private User login(String username, String password) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+
+			// miramos si ese usuario esta registrado.
+
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt
+					.executeQuery("select * from user where username = '"
+							+ username + "'");
+			if (rs.next())// si existe ese usuario
+			{
+				User user = new User();
+				user.setUserid(rs.getInt("id"));
+				user.setUsername(rs.getString("username"));
+				user.setPassword(rs.getString("password"));
+				user.setEmail(rs.getString("email"));
+				user.setName(rs.getString("name"));
+
+				// Comprobamos que el nombre de usuario y la contraseña sean las
+				// correctas.
+				Statement stmt1 = connection.createStatement();
+				StringBuilder sb = new StringBuilder(
+						"select username from user where password =MD5('"
+								+ password + "')");
+				ResultSet rs1 = stmt1.executeQuery(sb.toString());
+
+				if (!rs1.next()) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.CONFLICT)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.CONFLICT.getStatusCode(),
+									"Password or username not correct.",
+									request)).build());
+				}
+
+				String username1 = rs1.getString("username");
+
+				if (!username.equals(username1)) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.CONFLICT)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.CONFLICT.getStatusCode(),
+									"Password or username not correct.",
+									request)).build());
+				}
+
+				// se ha registrado como administrador
+
+				if (username.equals("admin")) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.CREATED)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.CREATED.getStatusCode(),
+									"user login as admin.", request)).build());
+
+				}
+
+				/*
+				 * Comprobamos con la query si sigue algun artista; Si sigue
+				 * algun artista ya se ha logueado anteriormente Si NO no se ha
+				 * logueado anteriormente
+				 */
+				// obtenemos el id del usuario:
+
+				Statement stmt4 = connection.createStatement();
+				ResultSet rs3 = stmt4
+						.executeQuery("select id from user where username = '"
+								+ username + "'");
+				rs3.next();
+
+				int iduser = rs3.getInt("id");
+
+				// comprobamos si ese usuario sigue a algun artista.
+				Statement stmt2 = connection.createStatement();
+				ResultSet rs2 = stmt2
+						.executeQuery("select idartist from follow where iduser= "
+								+ iduser + "");
+				if (rs2.next()) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.OK)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.OK.getStatusCode(),
+									"The user is following artists.", request))
+							.build());
+				}
+
+				if (!rs2.next()) {
+
+					throw new WebApplicationException(Response
+							.status(Response.Status.ACCEPTED)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.ACCEPTED.getStatusCode(),
+									"The user is not following any artist.",
+									request)).build());
+
+				}
+				stmt.close();
+				stmt1.close();
+				stmt2.close();
+				stmt4.close();
+				return user;
+
+			} else {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"User not found.", request)).build());
+			}
+
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+
 	}
 
 }

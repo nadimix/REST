@@ -40,3 +40,5 @@ Thumbs.db
 .project
 .classpath
 build/
+WebContent/WEB-INF/lib/
+WebContent/web/

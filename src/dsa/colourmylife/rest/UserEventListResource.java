@@ -113,7 +113,7 @@ public class UserEventListResource {
 
 			StringBuilder sb1 = new StringBuilder(
 					"SELECT id from assist where iduser=" + iduser
-							+ " and idevent=" + idevent + "");
+							+ " and idevent='" + idevent + "';");
 
 			ResultSet rs2 = stmt1.executeQuery(sb1.toString());
 
@@ -132,7 +132,7 @@ public class UserEventListResource {
 			// marcamos el evento como asistido por el usuario.
 			StringBuilder sb2 = new StringBuilder(
 					"INSERT INTO  assist (iduser,idevent) values (" + iduser
-							+ "," + idevent + ")");
+							+ "," + idevent + ");");
 
 			int rc = stmt.executeUpdate(sb2.toString());
 			if (rc == 0) {
@@ -213,7 +213,7 @@ public class UserEventListResource {
 			// desmarcamos el evento asistido por el usuario.
 
 			StringBuilder sb2 = new StringBuilder(
-					"DELETE from assist where idevent=" + idevent + "");
+					"DELETE from assist where idevent='" + idevent + "';");
 
 			int rc = stmt2.executeUpdate(sb2.toString());
 			if (rc == 0) {

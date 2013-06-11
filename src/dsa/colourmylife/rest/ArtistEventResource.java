@@ -231,7 +231,8 @@ public class ArtistEventResource {
 		try {
 			Statement stmt = connection.createStatement();
 			// DELETE FROM event WHERE id=2 and artist='Florence';
-			int rs = stmt.executeUpdate("DELETE FROM event WHERE id="+eventid+" and artist='"+name+"';");
+			int rs = stmt.executeUpdate("DELETE FROM event WHERE id=" + eventid
+					+ " and artist='" + name + "';");
 			if (rs == 0)
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)

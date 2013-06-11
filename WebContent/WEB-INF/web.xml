@@ -28,12 +28,10 @@
 		<web-resource-collection>
 			<web-resource-name>ArtistResource</web-resource-name>
 			<url-pattern>/api/artists/*</url-pattern>
-			<http-method>GET</http-method>
 			<http-method>PUT</http-method>
-			<http-method>UPDATE</http-method>
+			<http-method>DELETE</http-method>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>registered</role-name>
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
@@ -42,11 +40,10 @@
 		<web-resource-collection>
 			<web-resource-name>ArtistListResource</web-resource-name>
 			<url-pattern>/api/artists</url-pattern>
-			<http-method>GET</http-method>
+<!-- 			<http-method>GET</http-method> -->
 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>registered</role-name>
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
@@ -90,19 +87,11 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-	<security-role>
-		<description>security role</description>
-		<role-name>admin</role-name>
-	</security-role>
-	<security-role>
-		<description>security role</description>
-		<role-name>registered</role-name>
-	</security-role>
+
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>UserResource</web-resource-name>
 			<url-pattern>/api/users/*</url-pattern>
-			<!-- <http-method>POST</http-method> -->
 			<http-method>DELETE</http-method>
 			<http-method>PUT</http-method>
 		</web-resource-collection>
@@ -140,7 +129,7 @@
 		<auth-method>BASIC</auth-method>
 		<realm-name>tomcat_realm</realm-name>
 	</login-config>
-	
+
 	<filter>
 		<filter-name>CORS</filter-name>
 		<filter-class>com.thetransactioncompany.cors.CORSFilter</filter-class>

@@ -159,7 +159,7 @@ public class UserArtistListResource {
 			// seleccionamos el id del usuario
 			Statement stmt = connection.createStatement();
 			StringBuilder sb = new StringBuilder(
-					"select id from user where username ='" + username + "'");
+					"select id from user where username ='" + username + "';");
 			ResultSet rs = stmt.executeQuery(sb.toString());
 
 			rs.next();
@@ -170,8 +170,8 @@ public class UserArtistListResource {
 			// desmarcamos el evento asistido por el usuario.
 
 			StringBuilder sb2 = new StringBuilder(
-					"DELETE from follow where idartist=" + idartist
-							+ "and iduser =" + iduser + "");
+					"DELETE from follow where idartist='" + idartist
+							+ "' and iduser ='" + iduser + "';");
 
 			int rc = stmt2.executeUpdate(sb2.toString());
 			if (rc == 0) {
@@ -231,7 +231,7 @@ public class UserArtistListResource {
 			// seleccionamos el id del usuario
 			Statement stmt = connection.createStatement();
 			StringBuilder sb = new StringBuilder(
-					"select id from user where username ='" + username + "'");
+					"select id from user where username ='" + username + "';");
 			ResultSet rs = stmt.executeQuery(sb.toString());
 
 			rs.next();
@@ -242,8 +242,8 @@ public class UserArtistListResource {
 			Statement stmt1 = connection.createStatement();
 
 			StringBuilder sb1 = new StringBuilder(
-					"SELECT id from follow where iduser=" + iduser
-							+ " and idartist=" + idartist + "");
+					"SELECT id from follow where iduser='" + iduser
+							+ "' and idartist='" + idartist + "';");
 
 			ResultSet rs2 = stmt1.executeQuery(sb1.toString());
 
@@ -261,8 +261,8 @@ public class UserArtistListResource {
 
 			// marcamos el evento como asistido por el usuario.
 			StringBuilder sb2 = new StringBuilder(
-					"INSERT INTO  follow (iduser,idartist) values (" + iduser
-							+ "," + idartist + ")");
+					"INSERT INTO  follow (iduser,idartist) values ('" + iduser
+							+ "', '" + idartist + "');");
 
 			int rc = stmt2.executeUpdate(sb2.toString());
 

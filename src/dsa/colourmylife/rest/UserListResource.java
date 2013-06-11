@@ -19,6 +19,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import dsa.colourmylife.rest.model.User;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
@@ -30,6 +31,9 @@ public class UserListResource {
 	@Context
 	protected HttpServletRequest request;
 
+	@Context
+	private SecurityContext security;
+	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> getUsersJSON() {
@@ -53,7 +57,7 @@ public class UserListResource {
 	}
 
 	private void insertUser(User user) {
-
+		
 		// obtenemos la conexion
 		Connection connection = null;
 		try {
@@ -103,7 +107,7 @@ public class UserListResource {
 					"INSERT INTO user (username,password,email,name) VALUES ('"
 							+ user.getUsername() + "',");
 			sb.append("MD5('" + user.getPassword() + "'),'" + user.getEmail()
-					+ "','" + user.getName() + "')");
+					+ "','" + user.getName() + "');");
 
 			Statement stmt = connection.createStatement();
 			int rc = stmt.executeUpdate(sb.toString());
@@ -125,7 +129,7 @@ public class UserListResource {
 
 			StringBuilder sb1 = new StringBuilder(
 					"INSERT INTO user_roles VALUES (LAST_INSERT_ID(),1,'"
-							+ user.getUsername() + "','registered')");
+							+ user.getUsername() + "','registered');");
 
 			Statement stmt1 = connection.createStatement();
 			int rc1 = stmt1.executeUpdate(sb1.toString());
@@ -178,7 +182,7 @@ public class UserListResource {
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt // terminar query
 					.executeQuery("select * from user where username = '"
-							+ username + "'");
+							+ username + "';");
 
 			return rs.next();
 		} catch (SQLException e) {
@@ -192,7 +196,13 @@ public class UserListResource {
 	}
 
 	private List<User> getUsers() {
-
+		if (!security.isUserInRole("admin")) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
+		}
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -207,7 +217,7 @@ public class UserListResource {
 		}
 		try {
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from user");
+			ResultSet rs = stmt.executeQuery("select * from user;");
 			List<User> users = new ArrayList<>();
 			while (rs.next()) {
 				User user = new User();
