@@ -103,13 +103,14 @@
 
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>UserEventListResource</web-resource-name>
-			<url-pattern>/api/users/*/events</url-pattern>
+			<web-resource-name>UserFavEventListResource</web-resource-name>
+			<url-pattern>/users/*/events/fav</url-pattern>
 			<http-method>POST</http-method>
 			<http-method>DELETE</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>registered</role-name>
+			<role-name>admin</role-name>			
 		</auth-constraint>
 	</security-constraint>
 

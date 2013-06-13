@@ -192,6 +192,18 @@ SELECT name FROM genre WHERE id=(SELECT idgenre1 FROM artist WHERE id=1);
 
 SELECT name FROM genre WHERE id=1;
 
+SELECT idartist FROM follow WHERE iduser=1;
+
+SELECT id FROM user WHERE username='ubuntu';
+
+SELECT name FROM artist WHERE id=1;
+
+SELECT name FROM artist where id=idartist;
+
+SELECT * FROM event WHERE artist='Florence' AND idkind=1;
+
+SELECT id FROM kind WHERE name ='Concert';
+
 */
 
 

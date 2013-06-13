@@ -44,7 +44,7 @@ public class UserArtistListResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Artist> getArtistFollowedsJSON() {
+	public List<Artist> getFollowArtistJSON() {
 		return getArtistsFollowed();
 	}
 
@@ -52,7 +52,7 @@ public class UserArtistListResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	// seria mejor pasar por parametro el evento como objeto?
-	public Response assistEventJSON(@PathParam("username") String username,
+	public Response insertFollowArtistJSON(@PathParam("username") String username,
 			int idartist) {
 
 		followArtist(username, idartist);
@@ -73,7 +73,7 @@ public class UserArtistListResource {
 
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteAssistEventJSON(
+	public Response deleteFollowArtistJSON(
 			@PathParam("username") String username, int idartist) {
 
 		deleteFollowArtist(username, idartist);

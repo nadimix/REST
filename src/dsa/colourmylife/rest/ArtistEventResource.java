@@ -84,7 +84,7 @@ public class ArtistEventResource {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	// Entiendo que para eliminar un evento basta con el eventid
-	public Response deleteArtistJSON(@PathParam("eventid") int eventid,
+	public Response deleteEventJSON(@PathParam("eventid") int eventid,
 			@PathParam("artist") String name) {
 		deleteEvent(eventid, name);
 		return Response.status(204).build();

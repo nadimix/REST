@@ -1,87 +1,51 @@
 package dsa.colourmylife.rest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 
+import dsa.colourmylife.rest.model.Artist;
+import dsa.colourmylife.rest.model.Event;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
 import dsa.colourmylife.rest.util.DataSourceSAP;
 
 @Path("/users/{username}/events")
 public class UserEventListResource {
+	//TODO add security contraints
+
+	@Context
+	private UriInfo uri;
 	@Context
 	protected HttpServletRequest request;
 	@Context
 	private SecurityContext security;
 
-	/*
-	 * RECURSOS: POST: añadir evento marcado a usuario DELETE: desmarcar evento
-	 * marcado por el usuario
-	 */
-
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response assistEventJSON(@PathParam("username") String username,
-			int idevent) {
-
-		assistEvent(username, idevent);
-		Response response = null;
-		try {
-
-			// PREGUNTAR QUE LOCATION TENEMOS QUE PONER DEL RESPONSE STATUS!!
-
-			response = Response.status(204)
-					.location(new URI("/users/{" + username + "}/events"))
-					.build();
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return response;
+	public List<Event> getEventListJSON(@PathParam("username") String username,
+			@QueryParam("kind") String kind) {
+		// All of this are Not NULL
+		return getEventList(username, kind);
 	}
 
-	@DELETE
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteAssistEventJSON(
-			@PathParam("username") String username, int idevent) {
-
-		deleteAssistEvent(username, idevent);
-		return Response.status(204).build();
-	}
-
-	private void assistEvent(String username, int idevent) {
-
-		if (security.isUserInRole("registered")) {
-
-			if (!security.getUserPrincipal().getName().equals(username)) {
-
-				throw new WebApplicationException(Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.FORBIDDEN.getStatusCode(),
-								"No estas autorizado.", request)).build());
-			}
-		}
-		// obtenemos la conexion
+	private List<Event> getEventList(String username, String kind) {
 		Connection connection = null;
-
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
 					.getConnection();
@@ -94,89 +58,100 @@ public class UserEventListResource {
 									"Service unavailable.", request)).build());
 		}
 
-		// Marcamos el evento al que el usuario ha asistido con la consulta a la
-		// base de datos.
-
 		try {
-
+			StringBuilder sb = null;
+			int iduser = obtainIdUser(username);
+			List<Artist> artist = getArtistName(iduser);
+			List<Event> artistEventList = new ArrayList<Event>();
+			connection.setAutoCommit(false);
 			Statement stmt = connection.createStatement();
-			StringBuilder sb = new StringBuilder(
-					"select * from user where username ='" + username + "'");
-			ResultSet rs = stmt.executeQuery(sb.toString());
 
-			rs.next();
-			int iduser = rs.getInt("id");
+			if (kind == null) {
+				// TODO function in order to convert kind into idkind
+				for (Artist A : artist) {
+					sb = new StringBuilder("SELECT * FROM event WHERE artist='"
+							+ A.getName() + "';");
+					ResultSet rs = stmt.executeQuery(sb.toString());
+					while (rs.next()) {
+						Event event = new Event();
+						event.setEventId(rs.getInt("id"));
+						event.setKindId(rs.getInt("idkind"));
+						event.setArtist(rs.getString("artist"));
+						event.setDate(rs.getString("date"));
+						event.setPlace(rs.getString("place"));
+						event.setCity(rs.getString("city"));
+						event.setCountry(rs.getString("country"));
+						event.setInfo(rs.getString("info"));
+						event.setInsertdate(rs.getString("insertdate"));
+						event.setLink(uri.getAbsolutePath().toString());
+						// @Path("/artists/{artist}/events/{eventid}")
+						event.setSameKindLink(uri.getBaseUri().toString()
+								+ "artists/" + artist + "/events?idkind="
+								+ event.getKindId());
+						event.setSameCountryLink(uri.getBaseUri().toString()
+								+ "artists/" + artist + "/events?country="
+								+ event.getCountry());
+						artistEventList.add(event);
+					}
+					if (artistEventList.size() == 0)
+						throw new WebApplicationException(Response
+								.status(Response.Status.NOT_FOUND)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.NOT_FOUND
+												.getStatusCode(),
+										"No Event List found.", request))
+								.build());
+					stmt.close();
+				}
 
-			// Comprobamos que al artista al que quiera seguir no lo este
-			// siguiendo ya.
-			Statement stmt1 = connection.createStatement();
-
-			StringBuilder sb1 = new StringBuilder(
-					"SELECT id from assist where iduser=" + iduser
-							+ " and idevent='" + idevent + "';");
-
-			ResultSet rs2 = stmt1.executeQuery(sb1.toString());
-
-			if (rs2.next()) {
-
-				throw new WebApplicationException(Response
-						.status(Response.Status.CONFLICT)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.CONFLICT.getStatusCode(),
-								"Ya has marcado este evento como asistido.",
-								request)).build());
+			} else {
+				int kindId = obtainKindId(kind);
+				// TODO query with idkind
+				for (Artist A : artist) {
+					// SELECT * FROM event WHERE artist='Florence' AND idkind=1;
+					sb = new StringBuilder("SELECT * FROM event WHERE artist='"
+							+ A.getName() + "' AND kind='" + kindId + "';");
+					ResultSet rs = stmt.executeQuery(sb.toString());
+					while (rs.next()) {
+						Event event = new Event();
+						event.setEventId(rs.getInt("id"));
+						event.setKindId(rs.getInt("idkind"));
+						event.setArtist(rs.getString("artist"));
+						event.setDate(rs.getString("date"));
+						event.setPlace(rs.getString("place"));
+						event.setCity(rs.getString("city"));
+						event.setCountry(rs.getString("country"));
+						event.setInfo(rs.getString("info"));
+						event.setInsertdate(rs.getString("insertdate"));
+						event.setLink(uri.getAbsolutePath().toString());
+						artistEventList.add(event);
+					}
+					if (artistEventList.size() == 0)
+						throw new WebApplicationException(Response
+								.status(Response.Status.NOT_FOUND)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.NOT_FOUND
+												.getStatusCode(),
+										"No Event List found.", request))
+								.build());
+					stmt.close();
+				}
 			}
-
-			Statement stmt2 = connection.createStatement();
-
-			// marcamos el evento como asistido por el usuario.
-			StringBuilder sb2 = new StringBuilder(
-					"INSERT INTO  assist (iduser,idevent) values (" + iduser
-							+ "," + idevent + ");");
-
-			int rc = stmt.executeUpdate(sb2.toString());
-			if (rc == 0) {
-
-				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Error al marcar el evento como asistido.",
-								request)).build());
-			}
-
-			stmt.close();
-			stmt1.close();
-			stmt2.close();
 			connection.close();
+			return artistEventList;
 
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(APIErrorBuilder.buildError(
 							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(), "Internal server error.",
-							request)).build());
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
 		}
 	}
 
-	private void deleteAssistEvent(String username, int idevent) {
-
-		if (security.isUserInRole("registered")) {
-
-			if (!security.getUserPrincipal().getName().equals(username)) {
-
-				throw new WebApplicationException(Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.FORBIDDEN.getStatusCode(),
-								"No estas autorizado.", request)).build());
-			}
-		}
-
-		// obtenemos la conexion
+	private int obtainIdUser(String username) {
 		Connection connection = null;
-
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
 					.getConnection();
@@ -190,53 +165,153 @@ public class UserEventListResource {
 		}
 
 		try {
+			Statement stmt = connection.createStatement();
 
-			/*
-			 * Statement stmt = connection.createStatement(); StringBuilder sb =
-			 * new StringBuilder( "select id from user where name ='" +
-			 * username+ "'"); ResultSet rs = stmt.executeQuery(sb.toString());
-			 * 
-			 * int iduser= rs.getInt("id");
-			 * 
-			 * Statement stmt1 = connection.createStatement();
-			 * 
-			 * StringBuilder sb1 = new StringBuilder(
-			 * "select event.id from event where (idkind= (select id from kind where name ='"
-			 * + eventkind+ "'))");
-			 * 
-			 * ResultSet rs1 = stmt1.executeQuery(sb1.toString());
-			 * 
-			 * int idevent= rs1.getInt("id");
-			 */
-			Statement stmt2 = connection.createStatement();
-
-			// desmarcamos el evento asistido por el usuario.
-
-			StringBuilder sb2 = new StringBuilder(
-					"DELETE from assist where idevent='" + idevent + "';");
-
-			int rc = stmt2.executeUpdate(sb2.toString());
-			if (rc == 0) {
-
+			// SELECT id FROM user WHERE username='ubuntu';
+			ResultSet rs = stmt
+					.executeQuery("SELECT id FROM user WHERE username='"
+							+ username + "';");
+			if (!rs.next()) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.NOT_FOUND.getStatusCode(),
-								"Event assisted not found.", request)).build());
+								"User not found.", request)).build());
 			}
-
-			stmt2.close();
+			int id = rs.getInt("id");
+			System.out.println(id);
+			stmt.close();
 			connection.close();
-
+			return id;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(APIErrorBuilder.buildError(
 							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(), "Internal server error.",
-							request)).build());
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	private String obtainArtistName(int id) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
 		}
 
+		try {
+			Statement stmt = connection.createStatement();
+
+			// SELECT name FROM artist WHERE id=1;
+			ResultSet rs = stmt
+					.executeQuery("SELECT name FROM artist WHERE id=" + id
+							+ ";");
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found maybe you need to follow someone.", request)).build());
+			}
+			String name = rs.getString("name");
+			System.out.println(name);
+			stmt.close();
+			connection.close();
+			return name;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	private List<Artist> getArtistName(int userId) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt
+					.executeQuery("SELECT idartist FROM follow where iduser="
+							+ userId + ";");
+			List<Artist> artistList = new ArrayList<>();
+			while (rs.next()) {
+				Artist artist = new Artist();
+				artist.setName(obtainArtistName(rs.getInt("id")));
+				artistList.add(artist);
+			}
+			stmt.close();
+			connection.close();
+			return artistList;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	private int obtainKindId(String kind) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT id FROM kind WHERE name ='Concert';
+			ResultSet rs = stmt.executeQuery("SELECT id FROM kind WHERE name='"
+					+ kind + "';");
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Kind not found.", request)).build());
+			}
+			int kindId = rs.getInt("id");
+			System.out.println(kindId);
+			stmt.close();
+			connection.close();
+			return kindId;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
 	}
 
 }

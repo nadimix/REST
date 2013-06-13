@@ -54,14 +54,14 @@ public class ArtistEventListResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Event> getEventListJSON(@PathParam("artist") String artistname,
 			@QueryParam("city") String city) {
-		// All of this are Not NULL
+		// All of this aren't NULL
 		return getEventList(artistname, city);
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createEventJSON(Event event, String artistname) {
+	public Response createEventJSON(Event event, @PathParam("artist") String artistname) {
 		int eventid = insertEvent(event, artistname);
 		Response response = null;
 		try {
