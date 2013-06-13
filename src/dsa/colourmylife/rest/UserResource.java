@@ -57,7 +57,6 @@ public class UserResource {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteUserJSON(@PathParam("username") String username) {
-
 		deleteUser(username);
 		return Response.status(204).build();
 	}
@@ -67,7 +66,6 @@ public class UserResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateUserJSON(@PathParam("username") String username,
 			User user) {
-
 		updateUser(username, user);
 
 		Response response = null;
@@ -84,9 +82,7 @@ public class UserResource {
 	}
 
 	private void updateUser(String username, User user) {
-
 		if (security.isUserInRole("registered")) {
-
 			if (!security.getUserPrincipal().getName().equals(username)) {
 
 				throw new WebApplicationException(Response
@@ -121,7 +117,8 @@ public class UserResource {
 		}
 
 		try {
-
+			// TODO check NOT NULL camps and check causes change password or another.
+			if (user.getUsername() != null && user.getName() != null && user.getEmail() !=null && user.getPassword() != null){
 			StringBuilder sb = new StringBuilder("update user set ");
 			sb.append("username='" + user.getUsername() + "'");
 			sb.append(",");
@@ -151,6 +148,7 @@ public class UserResource {
 
 			Statement stmt1 = connection.createStatement();
 			stmt1.executeUpdate(sb1.toString());
+			}
 
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
@@ -195,66 +193,54 @@ public class UserResource {
 	}
 
 	private void deleteUser(String username) {
-
-		if (security.isUserInRole("registered")) {
-
-			if (!security.getUserPrincipal().getName().equals(username)) {
-
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			if (security.isUserInRole("registered")
+					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.FORBIDDEN)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.FORBIDDEN.getStatusCode(),
-								"No estas autorizado.", request)).build());
-			} else {
-
-				if (!security.isUserInRole("admin")) {
-					throw new WebApplicationException(Response
-							.status(Response.Status.FORBIDDEN)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.FORBIDDEN.getStatusCode(),
-									"No estas autorizado.", request)).build());
-
-				}
+								"FORBIDDEN", request)).build());
 			}
-
-		}
-		Connection connection = null;
-		try {
-			connection = DataSourceSAP.getInstance().getDataSource()
-					.getConnection();
-		} catch (SQLException e) {
-			throw new WebApplicationException(
-					Response.status(Response.Status.SERVICE_UNAVAILABLE)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.SERVICE_UNAVAILABLE
-											.getStatusCode(),
-									"Service unavailable.", request)).build());
-		}
-		try {
-
-			// Borramos al usuario de la tabla user.
-			Statement stmt = connection.createStatement();
-			int rc = stmt.executeUpdate("DELETE from user where username = '"
-					+ username + "'");
-			if (rc == 0)
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
+						.status(Response.Status.SERVICE_UNAVAILABLE)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"User not found.", request)).build());
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+			try {
+				// Borramos al usuario de la tabla user.
+				Statement stmt = connection.createStatement();
+				int rc = stmt
+						.executeUpdate("DELETE from user where username = '"
+								+ username + "'");
+				if (rc == 0)
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"User not found.", request)).build());
 
-			// Borramos al usuario de la tabla user_roles.
-			Statement stmt1 = connection.createStatement();
-			stmt1.executeUpdate("DELETE from user_roles where username = '"
-					+ username + "'");
+				// Borramos al usuario de la tabla user_roles.
+				Statement stmt1 = connection.createStatement();
+				stmt1.executeUpdate("DELETE from user_roles where username = '"
+						+ username + "'");
 
-		} catch (SQLException e) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(), "Internal server error.",
-							request)).build());
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Internal server error.", request)).build());
+			}
 		}
 	}
 
@@ -367,7 +353,8 @@ public class UserResource {
 				// correctas.
 				Statement stmt1 = connection.createStatement();
 				StringBuilder sb = new StringBuilder(
-						"select username from user where username='"+user.getUsername()+"' and password =MD5('"
+						"select username from user where username='"
+								+ user.getUsername() + "' and password =MD5('"
 								+ password + "')");
 				ResultSet rs1 = stmt1.executeQuery(sb.toString());
 
