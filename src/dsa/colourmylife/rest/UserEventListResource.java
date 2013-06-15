@@ -105,14 +105,14 @@ public class UserEventListResource {
 									+ event.getCountry());
 							artistEventList.add(event);
 						}
-						if (artistEventList.size() == 0)
-							throw new WebApplicationException(Response
-									.status(Response.Status.NOT_FOUND)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.NOT_FOUND
-													.getStatusCode(),
-											"No Event List found.", request))
-									.build());
+//						if (artistEventList.size() == 0)
+//							throw new WebApplicationException(Response
+//									.status(Response.Status.NOT_FOUND)
+//									.entity(APIErrorBuilder.buildError(
+//											Response.Status.NOT_FOUND
+//													.getStatusCode(),
+//											"No Event List found.", request))
+//									.build());
 						stmt.close();
 					}
 				} else {
@@ -143,14 +143,14 @@ public class UserEventListResource {
 							artistEventList.add(event);
 						}
 						stmt.close();
-						if (artistEventList.size() == 0)
-							throw new WebApplicationException(Response
-									.status(Response.Status.NOT_FOUND)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.NOT_FOUND
-													.getStatusCode(),
-											"No Event List found.", request))
-									.build());
+//						if (artistEventList.size() == 0)
+//							throw new WebApplicationException(Response
+//									.status(Response.Status.NOT_FOUND)
+//									.entity(APIErrorBuilder.buildError(
+//											Response.Status.NOT_FOUND
+//													.getStatusCode(),
+//											"No Event List found.", request))
+//									.build());
 					}
 				}
 				connection.close();
