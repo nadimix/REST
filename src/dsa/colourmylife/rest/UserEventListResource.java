@@ -27,8 +27,6 @@ import dsa.colourmylife.rest.util.DataSourceSAP;
 
 @Path("/users/{username}/events")
 public class UserEventListResource {
-	// TODO add security contraints
-
 	@Context
 	private UriInfo uri;
 	@Context
@@ -73,8 +71,6 @@ public class UserEventListResource {
 				List<Artist> artist = getArtistName(iduser);
 				List<Event> artistEventList = new ArrayList<>();
 				if (kind == null) {
-					// TODO function in order to convert kind into idkind
-					// while(artist.size() != 0)
 					for (Artist A : artist) {
 						Statement stmt = connection.createStatement();
 						sb = new StringBuilder(
@@ -86,6 +82,8 @@ public class UserEventListResource {
 							Event event = new Event();
 							event.setEventId(rs.getInt("id"));
 							event.setKindId(rs.getInt("idkind"));
+							String kind2 = obtainKind(rs.getInt("idkind"));
+							event.setKind(kind2);
 							event.setArtist(rs.getString("artist"));
 							event.setDate(rs.getString("date"));
 							event.setPlace(rs.getString("place"));
@@ -105,19 +103,10 @@ public class UserEventListResource {
 									+ event.getCountry());
 							artistEventList.add(event);
 						}
-//						if (artistEventList.size() == 0)
-//							throw new WebApplicationException(Response
-//									.status(Response.Status.NOT_FOUND)
-//									.entity(APIErrorBuilder.buildError(
-//											Response.Status.NOT_FOUND
-//													.getStatusCode(),
-//											"No Event List found.", request))
-//									.build());
 						stmt.close();
 					}
 				} else {
 					int kindId = obtainKindId(kind);
-					// TODO query with idkind
 					for (Artist A : artist) {
 						// SELECT * FROM event WHERE artist='Florence' AND
 						// idkind=1;
@@ -132,6 +121,7 @@ public class UserEventListResource {
 							Event event = new Event();
 							event.setEventId(rs.getInt("id"));
 							event.setKindId(rs.getInt("idkind"));
+							event.setKind(kind);
 							event.setArtist(rs.getString("artist"));
 							event.setDate(rs.getString("date"));
 							event.setPlace(rs.getString("place"));
@@ -143,14 +133,6 @@ public class UserEventListResource {
 							artistEventList.add(event);
 						}
 						stmt.close();
-//						if (artistEventList.size() == 0)
-//							throw new WebApplicationException(Response
-//									.status(Response.Status.NOT_FOUND)
-//									.entity(APIErrorBuilder.buildError(
-//											Response.Status.NOT_FOUND
-//													.getStatusCode(),
-//											"No Event List found.", request))
-//									.build());
 					}
 				}
 				connection.close();
@@ -332,6 +314,48 @@ public class UserEventListResource {
 			stmt.close();
 			connection.close();
 			return kindId;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+	public String obtainKind(int kindid) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT name FROM kind WHERE id=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT name FROM kind WHERE id=" + kindid + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Kind not found.", request)).build());
+			}
+			String kind = rs.getString("name");
+			System.out.println("kind: " + kind);
+			stmt.close();
+			connection.close();
+			return kind;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
