@@ -204,6 +204,8 @@ SELECT * FROM event WHERE artist='Florence' AND idkind=1;
 
 SELECT id FROM kind WHERE name ='Concert';
 
+UPDATE user SET password=MD5("test"), email='otro@mail.com', name='roger3';
+
 */
 
 

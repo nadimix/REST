@@ -171,7 +171,9 @@ public class ArtistListResource {
 		}
 		try {
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM artist;");
+			StringBuilder sb = new StringBuilder("SELECT * FROM artist;");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
 			// SELECT name FROM genre WHERE id=(SELECT idgenre1 FROM artist
 			// WHERE id=1);
 			List<Artist> artistList = new ArrayList<>();
@@ -189,6 +191,7 @@ public class ArtistListResource {
 					artist.setGenre2(genre2);
 				}
 				artistList.add(artist);
+				System.out.println("Artist: "+artist.getName());
 			}
 			stmt.close();
 			connection.close();

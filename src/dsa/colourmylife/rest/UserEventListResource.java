@@ -27,7 +27,7 @@ import dsa.colourmylife.rest.util.DataSourceSAP;
 
 @Path("/users/{username}/events")
 public class UserEventListResource {
-	//TODO add security contraints
+	// TODO add security contraints
 
 	@Context
 	private UriInfo uri;
@@ -45,112 +45,130 @@ public class UserEventListResource {
 	}
 
 	private List<Event> getEventList(String username, String kind) {
-		Connection connection = null;
-		try {
-			connection = DataSourceSAP.getInstance().getDataSource()
-					.getConnection();
-		} catch (SQLException e) {
-			throw new WebApplicationException(
-					Response.status(Response.Status.SERVICE_UNAVAILABLE)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.SERVICE_UNAVAILABLE
-											.getStatusCode(),
-									"Service unavailable.", request)).build());
-		}
-
-		try {
-			StringBuilder sb = null;
-			int iduser = obtainIdUser(username);
-			List<Artist> artist = getArtistName(iduser);
-			List<Event> artistEventList = new ArrayList<Event>();
-			connection.setAutoCommit(false);
-			Statement stmt = connection.createStatement();
-
-			if (kind == null) {
-				// TODO function in order to convert kind into idkind
-				for (Artist A : artist) {
-					sb = new StringBuilder("SELECT * FROM event WHERE artist='"
-							+ A.getName() + "';");
-					ResultSet rs = stmt.executeQuery(sb.toString());
-					while (rs.next()) {
-						Event event = new Event();
-						event.setEventId(rs.getInt("id"));
-						event.setKindId(rs.getInt("idkind"));
-						event.setArtist(rs.getString("artist"));
-						event.setDate(rs.getString("date"));
-						event.setPlace(rs.getString("place"));
-						event.setCity(rs.getString("city"));
-						event.setCountry(rs.getString("country"));
-						event.setInfo(rs.getString("info"));
-						event.setInsertdate(rs.getString("insertdate"));
-						event.setLink(uri.getAbsolutePath().toString());
-						// @Path("/artists/{artist}/events/{eventid}")
-						event.setSameKindLink(uri.getBaseUri().toString()
-								+ "artists/" + artist + "/events?idkind="
-								+ event.getKindId());
-						event.setSameCountryLink(uri.getBaseUri().toString()
-								+ "artists/" + artist + "/events?country="
-								+ event.getCountry());
-						artistEventList.add(event);
-					}
-					if (artistEventList.size() == 0)
-						throw new WebApplicationException(Response
-								.status(Response.Status.NOT_FOUND)
-								.entity(APIErrorBuilder.buildError(
-										Response.Status.NOT_FOUND
-												.getStatusCode(),
-										"No Event List found.", request))
-								.build());
-					stmt.close();
-				}
-
-			} else {
-				int kindId = obtainKindId(kind);
-				// TODO query with idkind
-				for (Artist A : artist) {
-					// SELECT * FROM event WHERE artist='Florence' AND idkind=1;
-					sb = new StringBuilder("SELECT * FROM event WHERE artist='"
-							+ A.getName() + "' AND kind='" + kindId + "';");
-					ResultSet rs = stmt.executeQuery(sb.toString());
-					while (rs.next()) {
-						Event event = new Event();
-						event.setEventId(rs.getInt("id"));
-						event.setKindId(rs.getInt("idkind"));
-						event.setArtist(rs.getString("artist"));
-						event.setDate(rs.getString("date"));
-						event.setPlace(rs.getString("place"));
-						event.setCity(rs.getString("city"));
-						event.setCountry(rs.getString("country"));
-						event.setInfo(rs.getString("info"));
-						event.setInsertdate(rs.getString("insertdate"));
-						event.setLink(uri.getAbsolutePath().toString());
-						artistEventList.add(event);
-					}
-					if (artistEventList.size() == 0)
-						throw new WebApplicationException(Response
-								.status(Response.Status.NOT_FOUND)
-								.entity(APIErrorBuilder.buildError(
-										Response.Status.NOT_FOUND
-												.getStatusCode(),
-										"No Event List found.", request))
-								.build());
-					stmt.close();
-				}
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			if (security.isUserInRole("registered")
+					&& !security.getUserPrincipal().getName().equals(username)) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.FORBIDDEN.getStatusCode(),
+								"FORBIDDEN", request)).build());
 			}
-			connection.close();
-			return artistEventList;
-
-		} catch (SQLException e) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(),
-							"Error accessing to database.", request)).build());
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.SERVICE_UNAVAILABLE)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+			try {
+				StringBuilder sb = null;
+				int iduser = obtainIdUser(username);
+				List<Artist> artist = getArtistName(iduser);
+				List<Event> artistEventList = new ArrayList<>();
+				if (kind == null) {
+					// TODO function in order to convert kind into idkind
+					// while(artist.size() != 0)
+					for (Artist A : artist) {
+						Statement stmt = connection.createStatement();
+						sb = new StringBuilder(
+								"SELECT * FROM event WHERE artist='"
+										+ A.getName() + "';");
+						System.out.println(sb);
+						ResultSet rs = stmt.executeQuery(sb.toString());
+						while (rs.next()) {
+							Event event = new Event();
+							event.setEventId(rs.getInt("id"));
+							event.setKindId(rs.getInt("idkind"));
+							event.setArtist(rs.getString("artist"));
+							event.setDate(rs.getString("date"));
+							event.setPlace(rs.getString("place"));
+							event.setCity(rs.getString("city"));
+							event.setCountry(rs.getString("country"));
+							event.setInfo(rs.getString("info"));
+							event.setInsertdate(rs.getString("insertdate"));
+							event.setLink(uri.getAbsolutePath().toString());
+							event.setSameKindLink(uri.getBaseUri().toString()
+									+ "artists/" + event.getArtist()
+									+ "/events?idkind=" + event.getKindId());
+							event.setSameCountryLink(uri.getBaseUri()
+									.toString()
+									+ "artists/"
+									+ event.getArtist()
+									+ "/events?country="
+									+ event.getCountry());
+							artistEventList.add(event);
+						}
+						if (artistEventList.size() == 0)
+							throw new WebApplicationException(Response
+									.status(Response.Status.NOT_FOUND)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.NOT_FOUND
+													.getStatusCode(),
+											"No Event List found.", request))
+									.build());
+						stmt.close();
+					}
+				} else {
+					int kindId = obtainKindId(kind);
+					// TODO query with idkind
+					for (Artist A : artist) {
+						// SELECT * FROM event WHERE artist='Florence' AND
+						// idkind=1;
+						Statement stmt = connection.createStatement();
+						sb = new StringBuilder(
+								"SELECT * FROM event WHERE artist='"
+										+ A.getName() + "' AND idkind='"
+										+ kindId + "';");
+						System.out.println(sb);
+						ResultSet rs = stmt.executeQuery(sb.toString());
+						while (rs.next()) {
+							Event event = new Event();
+							event.setEventId(rs.getInt("id"));
+							event.setKindId(rs.getInt("idkind"));
+							event.setArtist(rs.getString("artist"));
+							event.setDate(rs.getString("date"));
+							event.setPlace(rs.getString("place"));
+							event.setCity(rs.getString("city"));
+							event.setCountry(rs.getString("country"));
+							event.setInfo(rs.getString("info"));
+							event.setInsertdate(rs.getString("insertdate"));
+							event.setLink(uri.getAbsolutePath().toString());
+							artistEventList.add(event);
+						}
+						stmt.close();
+						if (artistEventList.size() == 0)
+							throw new WebApplicationException(Response
+									.status(Response.Status.NOT_FOUND)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.NOT_FOUND
+													.getStatusCode(),
+											"No Event List found.", request))
+									.build());
+					}
+				}
+				connection.close();
+				return artistEventList;
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			}
 		}
+		return null;
 	}
 
-	private int obtainIdUser(String username) {
+	public int obtainIdUser(String username) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -166,11 +184,11 @@ public class UserEventListResource {
 
 		try {
 			Statement stmt = connection.createStatement();
-
 			// SELECT id FROM user WHERE username='ubuntu';
-			ResultSet rs = stmt
-					.executeQuery("SELECT id FROM user WHERE username='"
-							+ username + "';");
+			StringBuilder sb = new StringBuilder(
+					"SELECT id FROM user WHERE username='" + username + "';");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
 			if (!rs.next()) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
@@ -179,7 +197,7 @@ public class UserEventListResource {
 								"User not found.", request)).build());
 			}
 			int id = rs.getInt("id");
-			System.out.println(id);
+			System.out.println("User id: " + id);
 			stmt.close();
 			connection.close();
 			return id;
@@ -193,7 +211,7 @@ public class UserEventListResource {
 		}
 	}
 
-	private String obtainArtistName(int id) {
+	public String obtainArtistName(int id) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -209,20 +227,22 @@ public class UserEventListResource {
 
 		try {
 			Statement stmt = connection.createStatement();
-
 			// SELECT name FROM artist WHERE id=1;
-			ResultSet rs = stmt
-					.executeQuery("SELECT name FROM artist WHERE id=" + id
-							+ ";");
+			StringBuilder sb = new StringBuilder(
+					"SELECT name FROM artist WHERE id=" + id + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
 			if (!rs.next()) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found maybe you need to follow someone.", request)).build());
+				throw new WebApplicationException(
+						Response.status(Response.Status.NOT_FOUND)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.NOT_FOUND
+												.getStatusCode(),
+										"Artist not found maybe you need to follow someone.",
+										request)).build());
 			}
 			String name = rs.getString("name");
-			System.out.println(name);
+			System.out.println("Artist :" + name);
 			stmt.close();
 			connection.close();
 			return name;
@@ -236,7 +256,7 @@ public class UserEventListResource {
 		}
 	}
 
-	private List<Artist> getArtistName(int userId) {
+	public List<Artist> getArtistName(int userId) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -251,13 +271,19 @@ public class UserEventListResource {
 		}
 		try {
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt
-					.executeQuery("SELECT idartist FROM follow where iduser="
-							+ userId + ";");
+			StringBuilder sb = new StringBuilder(
+					"SELECT idartist FROM follow where iduser=" + userId + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
 			List<Artist> artistList = new ArrayList<>();
 			while (rs.next()) {
 				Artist artist = new Artist();
-				artist.setName(obtainArtistName(rs.getInt("id")));
+				artist.setArtistid(rs.getInt("idartist"));
+				System.out.println("Artist id: " + artist.getArtistId());
+				String name = obtainArtistName(artist.getArtistId());
+				System.out.println("Name check: " + name);
+				artist.setName(name);
+				System.out.println("Artist: " + artist.getName());
 				artistList.add(artist);
 			}
 			stmt.close();
@@ -273,7 +299,7 @@ public class UserEventListResource {
 		}
 	}
 
-	private int obtainKindId(String kind) {
+	public int obtainKindId(String kind) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -290,8 +316,10 @@ public class UserEventListResource {
 		try {
 			Statement stmt = connection.createStatement();
 			// SELECT id FROM kind WHERE name ='Concert';
-			ResultSet rs = stmt.executeQuery("SELECT id FROM kind WHERE name='"
-					+ kind + "';");
+			StringBuilder sb = new StringBuilder(
+					"SELECT id FROM kind WHERE name='" + kind + "';");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
 			if (!rs.next()) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
@@ -300,7 +328,7 @@ public class UserEventListResource {
 								"Kind not found.", request)).build());
 			}
 			int kindId = rs.getInt("id");
-			System.out.println(kindId);
+			System.out.println("kindId: " + kindId);
 			stmt.close();
 			connection.close();
 			return kindId;
