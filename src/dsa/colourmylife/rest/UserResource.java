@@ -82,81 +82,85 @@ public class UserResource {
 	}
 
 	private void updateUser(String username, User user) {
-		if (security.isUserInRole("registered")) {
-			if (!security.getUserPrincipal().getName().equals(username)) {
-
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			if (security.isUserInRole("registered")
+					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.FORBIDDEN)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.FORBIDDEN.getStatusCode(),
-								"No estas autorizado.", request)).build());
+								"FORBIDDEN", request)).build());
 			}
 
-		}
-
-		if (userExists(user.getUsername())) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.CONFLICT)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.CONFLICT.getStatusCode(),
-							"username used by other user.", request)).build());
-
-		}
-
-		Connection connection = null;
-		try {
-			connection = DataSourceSAP.getInstance().getDataSource()
-					.getConnection();
-		} catch (SQLException e) {
-			throw new WebApplicationException(
-					Response.status(Response.Status.SERVICE_UNAVAILABLE)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.SERVICE_UNAVAILABLE
-											.getStatusCode(),
-									"Service unavailable.", request)).build());
-		}
-
-		try {
-			// TODO check NOT NULL camps and check causes change password or another.
-			if (user.getUsername() != null && user.getName() != null && user.getEmail() !=null && user.getPassword() != null){
-			StringBuilder sb = new StringBuilder("update user set ");
-			sb.append("username='" + user.getUsername() + "'");
-			sb.append(",");
-			sb.append("password=MD5('" + user.getPassword() + "')");
-			sb.append(",");
-			sb.append("email='" + user.getEmail() + "'");
-			sb.append(",");
-			sb.append("name='" + user.getName() + "'");
-			sb.append(" where username='" + username + "'");
-
-			// PRUEBA:
-			System.out.println(sb.toString());
-
-			Statement stmt = connection.createStatement();
-			int rc = stmt.executeUpdate(sb.toString());
-			if (rc == 0)
+			if (userExists(user.getUsername())) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
+						.status(Response.Status.CONFLICT)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"User not found.", request)).build());
+								Response.Status.CONFLICT.getStatusCode(),
+								"username used by other user.", request))
+						.build());
 
-			// modificamos el username de la tabla user_roles
-			StringBuilder sb1 = new StringBuilder("update user_roles set ");
-			sb1.append("username='" + user.getUsername() + "'");
-			sb1.append(" where username='" + username + "'");
-
-			Statement stmt1 = connection.createStatement();
-			stmt1.executeUpdate(sb1.toString());
 			}
 
-		} catch (SQLException e) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(), "Internal server error.",
-							request)).build());
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.SERVICE_UNAVAILABLE)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+
+			try {
+				// TODO check NOT NULL camps and check causes change password or
+				// another.
+				if (user.getName() != null && user.getEmail() != null
+						&& user.getPassword() != null) {
+					// UPDATE user SET password=MD5('test2'),
+					// email='otro2@mail.com', name='roger4' WHERE
+					// username='Rog6';
+					StringBuilder sb = new StringBuilder("UPDATE user SET ");
+					sb.append("password=MD5('" + user.getPassword() + "'), ");
+					sb.append("email='" + user.getEmail() + "', ");
+					sb.append("name='" + user.getName() + "' ");
+					sb.append("WHERE username='" + username + "';");
+
+					// PRUEBA:
+					System.out.println(sb.toString());
+
+					Statement stmt = connection.createStatement();
+					int rc = stmt.executeUpdate(sb.toString());
+					if (rc == 0)
+						throw new WebApplicationException(Response
+								.status(Response.Status.NOT_FOUND)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.NOT_FOUND
+												.getStatusCode(),
+										"User not found.", request)).build());
+
+					// // modificamos el username de la tabla user_roles
+					// StringBuilder sb1 = new StringBuilder(
+					// "update user_roles set ");
+					// sb1.append("username='" + user.getUsername() + "'");
+					// sb1.append(" where username='" + username + "'");
+					//
+					// Statement stmt1 = connection.createStatement();
+					// stmt1.executeUpdate(sb1.toString());
+				}
+
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Internal server error.", request)).build());
+			}
 		}
 	}
 
