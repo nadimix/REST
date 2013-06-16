@@ -91,7 +91,9 @@ public class UserEventListResource {
 							event.setCountry(rs.getString("country"));
 							event.setInfo(rs.getString("info"));
 							event.setInsertdate(rs.getString("insertdate"));
-							event.setLink(uri.getAbsolutePath().toString());
+							event.setLink(uri.getBaseUri().toString()
+									+ "artists/" + event.getArtist()
+									+ "/events/" + event.getEventId());
 							event.setSameKindLink(uri.getBaseUri().toString()
 									+ "artists/" + event.getArtist()
 									+ "/events?idkind=" + event.getKindId());
@@ -129,7 +131,17 @@ public class UserEventListResource {
 							event.setCountry(rs.getString("country"));
 							event.setInfo(rs.getString("info"));
 							event.setInsertdate(rs.getString("insertdate"));
-							event.setLink(uri.getAbsolutePath().toString());
+							event.setLink(uri.getAbsolutePath().toString()
+									+ "/" + event.getEventId());
+							event.setLink(uri.getBaseUri().toString()
+									+ "artists/" + event.getArtist()
+									+ "/events/" + event.getEventId());
+							event.setSameCountryLink(uri.getBaseUri()
+									.toString()
+									+ "artists/"
+									+ event.getArtist()
+									+ "/events?country="
+									+ event.getCountry());
 							artistEventList.add(event);
 						}
 						stmt.close();
@@ -323,6 +335,7 @@ public class UserEventListResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
+
 	public String obtainKind(int kindid) {
 		Connection connection = null;
 		try {
