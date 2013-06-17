@@ -1,7 +1,5 @@
 package dsa.colourmylife.rest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -93,20 +91,19 @@ public class UserEventListResource {
 							event.setCountry(rs.getString("country"));
 							event.setInfo(rs.getString("info"));
 							event.setInsertdate(rs.getString("insertdate"));
-//							//URLEncoder.encode("random word £500 bank $", "ISO-8859-1"); or "UTF-8"
 							event.setLink(uri.getBaseUri().toString()
-									+ "artists/" + URLEncoder.encode(event.getArtist(), "UTF-8")
+									+ "artists/" + event.getArtist()
 									+ "/events/" + event.getEventId());							
 							System.out.println("URL: "+event.getLink());							
 							event.setSameKindLink(uri.getBaseUri().toString()
-									+ "artists/" + URLEncoder.encode(event.getArtist(), "UTF-8")
+									+ "artists/" + event.getArtist()
 									+ "/events?idkind=" + event.getKindId());
 							event.setSameCountryLink(uri.getBaseUri()
 									.toString()
 									+ "artists/"
-									+ URLEncoder.encode(event.getArtist(), "UTF-8")
+									+ event.getArtist()
 									+ "/events?country="
-									+ URLEncoder.encode(event.getCountry(), "UTF-8"));
+									+ event.getCountry());
 							artistEventList.add(event);
 						}
 						stmt.close();
@@ -138,14 +135,14 @@ public class UserEventListResource {
 //							event.setLink(uri.getAbsolutePath().toString()
 //									+ "/" + event.getEventId());
 							event.setLink(uri.getBaseUri().toString()
-									+ "artists/" + URLEncoder.encode(event.getArtist(), "UTF-8")
+									+ "artists/" + event.getArtist()
 									+ "/events/" + event.getEventId());
 							event.setSameCountryLink(uri.getBaseUri()
 									.toString()
 									+ "artists/"
-									+ URLEncoder.encode(event.getArtist(), "UTF-8")
+									+ event.getArtist()
 									+ "/events?country="
-									+ URLEncoder.encode(event.getCountry(), "UTF-8"));
+									+ event.getCountry());
 							artistEventList.add(event);
 						}
 						stmt.close();
@@ -161,9 +158,6 @@ public class UserEventListResource {
 										.getStatusCode(),
 								"Error accessing to database.", request))
 						.build());
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} 
 		}
 		return null;
