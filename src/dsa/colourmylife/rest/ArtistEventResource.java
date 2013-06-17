@@ -130,7 +130,7 @@ public class ArtistEventResource {
 			event.setInfo(rs.getString("info"));
 			event.setInsertdate(rs.getString("insertdate"));
 			event.setLink(uri.getAbsolutePath().toString());
-			System.out.println("Link: "+event.getLink());
+			System.out.println("Link: " + event.getLink());
 			// @Path("/artists/{artist}/events/{eventid}")
 			event.setSameKindLink(uri.getBaseUri().toString() + "/artists/"
 					+ name + "/events?idkind=" + event.getKindId());
@@ -184,13 +184,24 @@ public class ArtistEventResource {
 			}
 			// UPDATE event SET date='2014-09-20 22:00:00', place='Palau
 			// Joventut', city='Badalona', country='Catalunya', info='new
-			// Location' WHERE artist='Florence';
+			// Location' WHERE artist='Florence' AND id=1;
 			// TODO verificar campos NOT NULLs!!!!!
-			StringBuilder sb = new StringBuilder("UPDATE event SET date='"
-					+ event.getDate() + "', place='" + event.getPlace()
-					+ "', city='" + event.getCity() + "', country='"
-					+ event.getCountry() + "', info='" + event.getInfo()
-					+ "' WHERE artist='" + name + "';");
+
+			StringBuilder sb = new StringBuilder("UPDATE event SET ");
+			if (event.getDate() != null) {
+				sb.append("date='" + event.getDate() + "', ");
+			}
+			if (event.getPlace() != null) {
+				sb.append("place='" + event.getPlace() + "', ");
+			}
+			if (event.getCity() != null) {
+				sb.append("city='" + event.getCity() + "', ");
+			}			
+			if (event.getInfo() != null) {
+				sb.append("info='" + event.getInfo() + "', ");
+			}
+			sb.append("country='" + event.getCountry() + "'");
+			sb.append(" WHERE artist='" + name + "' AND id=" + eventid + ";");
 			System.out.println(sb);
 
 			int rs = stmt.executeUpdate(sb.toString());
@@ -254,6 +265,7 @@ public class ArtistEventResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
+
 	public String obtainKind(int kindid) {
 		Connection connection = null;
 		try {
