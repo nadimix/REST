@@ -186,6 +186,10 @@ SELECT * FROM event WHERE artist='Florence';
 
 SELECT * FROM event WHERE artist='Florence' AND city='Badalona';
 
+SELECT * FROM event WHERE artist='Florence' AND idkind=1;
+
+SELECT * FROM event WHERE artist='Florence' AND idkind=1 AND city='Badalona';
+
 DELETE FROM event WHERE id=2 and artist='Florence';
 
 SELECT name FROM genre WHERE id=(SELECT idgenre1 FROM artist WHERE id=1);
