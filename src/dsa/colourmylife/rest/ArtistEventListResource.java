@@ -93,7 +93,7 @@ public class ArtistEventListResource {
 
 		try {
 			Statement stmt = connection.createStatement();
-			StringBuilder sb = null;
+			StringBuilder sb = new StringBuilder();
 			if (artist == null) {
 				// SELECT * FROM event;
 				sb = new StringBuilder("SELECT * FROM event;");
@@ -128,6 +128,7 @@ public class ArtistEventListResource {
 						+ artist + "';");
 				System.out.println(sb);
 			}
+			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
 			List<Event> artistEventList = new ArrayList<Event>();
 			while (rs.next()) {
@@ -188,6 +189,23 @@ public class ArtistEventListResource {
 		}
 		try {
 			Statement stmt = connection.createStatement();
+			if (artist == null) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.CONFLICT)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.CONFLICT.getStatusCode(),
+								"Artist doesn't exists", request)).build());
+			}
+			if (event.getKindId() == 0 || event.getCountry() == null) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.CONFLICT)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.CONFLICT.getStatusCode(),
+								"KindId or Country fields mustn't been empty",
+								request)).build());
+			}
+			// TODO check KindId exists
+			idKindExists(event.getKindId());
 			String insert = buildInsert(event, artist);
 			id = event.getEventId();
 			int rs = stmt.executeUpdate(insert);
@@ -216,14 +234,37 @@ public class ArtistEventListResource {
 	}
 
 	private String buildInsert(Event event, String artist) {
-		StringBuilder sb = new StringBuilder();
 		// INSERT INTO event VALUES (NULL, 1, 'Florence', '2013-09-20 22:00:00',
 		// 'Palau Sant Jordi', 'Barcelona', 'Catalunya', 'Va a ser inolvidable',
 		// NOW());
-		sb.append("INSERT INTO event VALUES (NULL, " + event.getEventId());
-		sb.append(", '" + artist + "', '" + event.getDate() + "', '");
-		sb.append(event.getPlace() + "', '" + event.getCity() + "', '");
-		sb.append(event.getCountry() + "', '" + event.getInfo() + "', NOW());");
+		// StringBuilder sb = new StringBuilder();
+		// sb.append("INSERT INTO event VALUES (NULL, " + event.getKindId());
+		// sb.append(", '" + artist + "', '" + event.getDate() + "', '");
+		// sb.append(event.getPlace() + "', '" + event.getCity() + "', '");
+		// sb.append(event.getCountry() + "', '" + event.getInfo() +
+		// "', NOW());");
+		StringBuilder sb = new StringBuilder("INSERT INTO event VALUES (NULL, ");
+		sb.append(event.getKindId() + ", '");
+		sb.append(artist + "', ");
+		if (event.getDate() != null) {
+			sb.append("'" + event.getDate() + "', ");
+		} else
+			sb.append("NULL, ");
+		if (event.getPlace() != null) {
+			sb.append("'" + event.getPlace() + "', ");
+		} else
+			sb.append("NULL, ");
+		if (event.getCity() != null) {
+			sb.append("'" + event.getCity() + "', ");
+		} else
+			sb.append("NULL, ");
+		sb.append("'" + event.getCountry() + "', ");
+		if (event.getInfo() != null) {
+			sb.append("'" + event.getInfo() + "', ");
+		} else
+			sb.append("NULL, ");
+		sb.append("NOW());");
+		System.out.println("Query: " + sb.toString());
 		return sb.toString();
 	}
 
@@ -334,6 +375,46 @@ public class ArtistEventListResource {
 								"Error accessing to database.", request))
 						.build());
 			}
+		}
+	}
+
+	public boolean idKindExists(int idkind) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM kind WHERE id=1;
+			StringBuilder sb = new StringBuilder("SELECT * FROM kind WHERE id="
+					+ idkind + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Kind not found.", request)).build());
+			}
+			stmt.close();
+			connection.close();
+			return true;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
 		}
 	}
 }

@@ -249,17 +249,7 @@ public class UserResource {
 	}
 
 	private User getUser(String username) {
-		if (security.isUserInRole("registered")
-				|| security.isUserInRole("admin")) {
-			if (security.isUserInRole("registered")
-					&& !security.getUserPrincipal().getName().equals(username)) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.FORBIDDEN.getStatusCode(),
-								"FORBIDDEN", request)).build());
-			}
-			Connection connection = null;
+		Connection connection = null;
 			try {
 				connection = DataSourceSAP.getInstance().getDataSource()
 						.getConnection();
@@ -303,27 +293,9 @@ public class UserResource {
 						.build());
 
 			}
-		}
-		// This returns maybe cause problems
-		return null;
 	}
 
-	private User login(String username, String password) {
-		if (!security.isUserInRole("registered")) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.FORBIDDEN)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.FORBIDDEN.getStatusCode(),
-							"FORBIDDEN", request)).build());
-		}
-		if (security.isUserInRole("registered")
-				&& !security.getUserPrincipal().getName().equals(username)) {
-			throw new WebApplicationException(Response
-					.status(Response.Status.FORBIDDEN)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.FORBIDDEN.getStatusCode(),
-							"FORBIDDEN", request)).build());
-		}
+	private User login(String username, String password) {		
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
