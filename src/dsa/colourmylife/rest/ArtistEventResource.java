@@ -90,7 +90,7 @@ public class ArtistEventResource {
 		return Response.status(204).build();
 	}
 
-	public Event getEvent(int eventid, String name) {
+	private Event getEvent(int eventid, String name) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -152,7 +152,7 @@ public class ArtistEventResource {
 		}
 	}
 
-	public void updateEvent(int eventid, Event event, String name) {
+	private void updateEvent(int eventid, Event event, String name) {
 		if (!security.isUserInRole("admin")) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.FORBIDDEN)
@@ -223,7 +223,7 @@ public class ArtistEventResource {
 		}
 	}
 
-	public void deleteEvent(int eventid, String name) {
+	private void deleteEvent(int eventid, String name) {
 		if (!security.isUserInRole("admin")) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.FORBIDDEN)

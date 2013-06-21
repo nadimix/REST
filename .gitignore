@@ -42,3 +42,4 @@ Thumbs.db
 build/
 WebContent/WEB-INF/lib/
 WebContent/web/
+*.swp

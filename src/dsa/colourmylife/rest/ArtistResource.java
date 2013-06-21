@@ -73,7 +73,7 @@ public class ArtistResource {
 		return response;
 	}
 
-	public Artist getArtist(String name) {
+	private Artist getArtist(String name) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()

@@ -233,7 +233,7 @@ public class ArtistEventListResource {
 		return id;
 	}
 
-	private String buildInsert(Event event, String artist) {
+	public String buildInsert(Event event, String artist) {
 		// INSERT INTO event VALUES (NULL, 1, 'Florence', '2013-09-20 22:00:00',
 		// 'Palau Sant Jordi', 'Barcelona', 'Catalunya', 'Va a ser inolvidable',
 		// NOW());

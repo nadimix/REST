@@ -47,9 +47,9 @@ public class UserFavEventListResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Event> getEventListJSON(@PathParam("username") String username,
-			@QueryParam("kind") String kind) {
+			@QueryParam("kind") String kind, @QueryParam("idevent") int eventid) {
 		// All of this are Not NULL
-		return getEventList(username, kind);
+		return getEventList(username, kind, eventid);
 	}	
 	
 	@POST
@@ -84,7 +84,7 @@ public class UserFavEventListResource {
 		return Response.status(204).build();
 	}
 
-	private void assistEvent(String username, @QueryParam("idevent") int idevent) {
+	private void assistEvent(String username, int idevent) {
 		if (security.isUserInRole("registered")
 				|| security.isUserInRole("admin")) {
 			if (security.isUserInRole("registered")
@@ -256,7 +256,7 @@ public class UserFavEventListResource {
 
 		}
 	}
-	private List<Event> getEventList(String username, String kind) {
+	private List<Event> getEventList(String username, String kind, int eventid) {
 		// TODO this method
 		if (security.isUserInRole("registered")
 				|| security.isUserInRole("admin")) {

@@ -163,7 +163,7 @@ public class UserListResource {
 
 	}
 
-	private boolean userExists(String username) {
+	public boolean userExists(String username) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
