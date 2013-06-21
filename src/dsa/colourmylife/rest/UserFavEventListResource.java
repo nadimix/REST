@@ -39,7 +39,6 @@ public class UserFavEventListResource {
 	@Context
 	private SecurityContext security;
 
-	// TODO verificar el security-constraint
 	/*
 	 * RECURSOS: POST: añadir evento marcado a usuario DELETE: desmarcar evento
 	 * marcado por el usuario
@@ -283,21 +282,21 @@ public class UserFavEventListResource {
 			try {
 				StringBuilder sb = null;
 				int iduser = obtainIdUser(username);
-				List<Artist> artist = getArtistName(iduser);
-				List<Event> artistEventList = new ArrayList<>();
-				for (Artist A : artist) {
+				List<Event> idEventAssist = getEventAssistList(iduser);
+				List<Event> eventAssist = new ArrayList<>();
+				for (Event E : idEventAssist) {
 					Statement stmt = connection.createStatement();
 					if (kind == null) {
 						sb = new StringBuilder(
-								"SELECT * FROM event WHERE artist='"
-										+ A.getName() + "';");
+								"SELECT * FROM event WHERE id="
+										+ E.getEventId() + ";");
 						System.out.println(sb);
 					} else {
 						int kindId = obtainKindId(kind);
 						sb = new StringBuilder(
-								"SELECT * FROM event WHERE artist='"
-										+ A.getName() + "' AND idkind='"
-										+ kindId + "';");
+								"SELECT * FROM event WHERE id='"
+										+ E.getEventId() + " AND idkind="
+										+ kindId + ";");
 						System.out.println(sb);
 					}
 					ResultSet rs = stmt.executeQuery(sb.toString());
@@ -324,12 +323,12 @@ public class UserFavEventListResource {
 						event.setSameCountryLink(uri.getBaseUri().toString()
 								+ "artists/" + event.getArtist()
 								+ "/events?country=" + event.getCountry());
-						artistEventList.add(event);
+						eventAssist.add(event);
 					}
 					stmt.close();
 				}
 				connection.close();
-				return artistEventList;
+				return eventAssist;
 			} catch (SQLException e) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -431,7 +430,7 @@ public class UserFavEventListResource {
 		}
 	}
 
-	public List<Artist> getArtistName(int userId) {
+	public List<Artist> getArtistNameList(int userId) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -582,6 +581,48 @@ public class UserFavEventListResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
+	}
+	
+	public List<Event> getEventAssistList(int userid){
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			//SELECT idevent FROM assist WHERE iduser=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT idevent FROM assist WHERE iduser=" + userid + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			List<Event> eventAssistList = new ArrayList<>();
+			while (rs.next()) {
+				Event event = new Event();
+				event.setEventId(rs.getInt("idevent"));
+				System.out.println("Eventid Assist: " + event.getEventId());
+				eventAssistList.add(event);
+			}
+			stmt.close();
+			connection.close();
+			return eventAssistList;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+		
 	}
 
 

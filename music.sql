@@ -210,6 +210,12 @@ SELECT id FROM kind WHERE name ='Concert';
 
 UPDATE user SET password=MD5("test"), email='otro@mail.com', name='roger3';
 
+INSERT INTO assist VALUES(NULL,1,1);
+INSERT INTO assist VALUES(NULL,1,2);
+INSERT INTO assist VALUES(NULL,2,3);
+
+SELECT idevent FROM assist WHERE iduser=1;
+
 */
 
 
