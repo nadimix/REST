@@ -83,7 +83,7 @@ public class UserResource {
 
 	private void updateUser(String username, User user) {
 		if (security.isUserInRole("registered")
-				|| security.isUserInRole("admin")) {
+				/*|| security.isUserInRole("admin")*/) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
@@ -92,17 +92,15 @@ public class UserResource {
 								Response.Status.FORBIDDEN.getStatusCode(),
 								"FORBIDDEN", request)).build());
 			}
-
-			if (userExists(user.getUsername())) {
+			if (!userExists(username)) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.CONFLICT)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.CONFLICT.getStatusCode(),
-								"username used by other user.", request))
+								"username don't exist", request))
 						.build());
 
 			}
-
 			Connection connection = null;
 			try {
 				connection = DataSourceSAP.getInstance().getDataSource()
@@ -161,6 +159,12 @@ public class UserResource {
 										.getStatusCode(),
 								"Internal server error.", request)).build());
 			}
+		} else {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
 		}
 	}
 
