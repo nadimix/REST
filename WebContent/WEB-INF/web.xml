@@ -51,6 +51,18 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
+<!--  UserEventListResource -->
+<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>UserEventListResource</web-resource-name>
+			<url-pattern>/api/users/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>registered</role-name>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
 
 	<security-constraint>
 		<web-resource-collection>
@@ -63,7 +75,6 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>ArtistListResource</web-resource-name>
@@ -74,7 +85,6 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>ArtistEventResource</web-resource-name>
@@ -88,7 +98,6 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>ArtistEventListResource</web-resource-name>
@@ -101,11 +110,6 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-
-
-
-
-
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>UserFavEventListResource</web-resource-name>
@@ -119,19 +123,6 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>UserEventListResource</web-resource-name>
-			<url-pattern>/users/*/events</url-pattern>
-			<http-method>GET</http-method>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>registered</role-name>
-			<role-name>admin</role-name>
-		</auth-constraint>
-	</security-constraint>
-
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>UserArtistListResource</web-resource-name>

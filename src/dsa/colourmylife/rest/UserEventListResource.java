@@ -44,7 +44,7 @@ public class UserEventListResource {
 
 	private List<Event> getEventList(String username, String kind) {
 		if (security.isUserInRole("registered")
-				|| security.isUserInRole("admin")) {
+		/* || security.isUserInRole("admin") */) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
@@ -125,7 +125,11 @@ public class UserEventListResource {
 						.build());
 			}
 		}
-		return null;
+		throw new WebApplicationException(Response
+				.status(Response.Status.FORBIDDEN)
+				.entity(APIErrorBuilder.buildError(
+						Response.Status.FORBIDDEN.getStatusCode(), "FORBIDDEN",
+						request)).build());
 	}
 
 	public int obtainIdUser(String username) {
