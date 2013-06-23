@@ -239,6 +239,7 @@ SELECT artist.id FROM artist INNER JOIN event on event.artist=artist.name;
 
 SELECT artist.id FROM artist INNER JOIN event on event.artist=artist.name AND event.id=1;
 
+DELETE FROM assist WHERE idevent=1 and iduser=1;
 
 */
 
