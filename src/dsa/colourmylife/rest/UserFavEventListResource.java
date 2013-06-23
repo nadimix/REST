@@ -78,180 +78,8 @@ public class UserFavEventListResource {
 		return Response.status(204).build();
 	}
 
-	private void assistEvent(String username, int idevent) {
-		if (security.isUserInRole("registered")
-		/* || security.isUserInRole("admin") */) {
-			if (security.isUserInRole("registered")
-					&& !security.getUserPrincipal().getName().equals(username)) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.FORBIDDEN.getStatusCode(),
-								"FORBIDDEN", request)).build());
-			}
-			// obtenemos la conexion
-			Connection connection = null;
-
-			try {
-				connection = DataSourceSAP.getInstance().getDataSource()
-						.getConnection();
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.SERVICE_UNAVAILABLE)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.SERVICE_UNAVAILABLE
-										.getStatusCode(),
-								"Service unavailable.", request)).build());
-			}
-
-			// Marcamos el evento al que el usuario ha asistido con la consulta
-			// a la
-			// base de datos.
-
-			try {
-
-				Statement stmt = connection.createStatement();
-				StringBuilder sb = new StringBuilder(
-						"select * from user where username ='" + username + "'");
-				System.out.println(sb);
-				ResultSet rs = stmt.executeQuery(sb.toString());
-
-				rs.next();
-				int iduser = rs.getInt("id");
-
-				// Comprobamos que al artista al que quiera seguir no lo este
-				// siguiendo ya.
-				Statement stmt1 = connection.createStatement();
-
-				StringBuilder sb1 = new StringBuilder(
-						"SELECT id from assist where iduser=" + iduser
-								+ " and idevent='" + idevent + "';");
-				System.out.println(sb1);
-
-				ResultSet rs2 = stmt1.executeQuery(sb1.toString());
-
-				if (rs2.next()) {
-					throw new WebApplicationException(
-							Response.status(Response.Status.CONFLICT)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.CONFLICT
-													.getStatusCode(),
-											"Ya has marcado este evento como asistido.",
-											request)).build());
-				}
-
-				Statement stmt2 = connection.createStatement();
-				// marcamos el evento como asistido por el usuario.
-				StringBuilder sb2 = new StringBuilder(
-						"INSERT INTO assist (iduser,idevent) values (" + iduser
-								+ "," + idevent + ");");
-				System.out.println(sb2);
-				int rc = stmt.executeUpdate(sb2.toString());
-				if (rc == 0) {
-					throw new WebApplicationException(Response
-							.status(Response.Status.NOT_FOUND)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.NOT_FOUND.getStatusCode(),
-									"Error al marcar el evento como asistido.",
-									request)).build());
-				}
-				stmt.close();
-				stmt1.close();
-				stmt2.close();
-				connection.close();
-
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.INTERNAL_SERVER_ERROR
-										.getStatusCode(),
-								"Internal server error.", request)).build());
-			}
-		}
-	}
-
-	private void deleteAssistEvent(String username, int idevent) {
-		if (security.isUserInRole("registered")
-				|| security.isUserInRole("admin")) {
-			if (security.isUserInRole("registered")
-					&& !security.getUserPrincipal().getName().equals(username)) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.FORBIDDEN.getStatusCode(),
-								"FORBIDDEN", request)).build());
-			}
-			// obtenemos la conexion
-			Connection connection = null;
-
-			try {
-				connection = DataSourceSAP.getInstance().getDataSource()
-						.getConnection();
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.SERVICE_UNAVAILABLE)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.SERVICE_UNAVAILABLE
-										.getStatusCode(),
-								"Service unavailable.", request)).build());
-			}
-			try {
-
-				/*
-				 * Statement stmt = connection.createStatement(); StringBuilder
-				 * sb = new StringBuilder( "select id from user where name ='" +
-				 * username+ "'"); ResultSet rs =
-				 * stmt.executeQuery(sb.toString());
-				 * 
-				 * int iduser= rs.getInt("id");
-				 * 
-				 * Statement stmt1 = connection.createStatement();
-				 * 
-				 * StringBuilder sb1 = new StringBuilder(
-				 * "select event.id from event where (idkind= (select id from kind where name ='"
-				 * + eventkind+ "'))");
-				 * 
-				 * ResultSet rs1 = stmt1.executeQuery(sb1.toString());
-				 * 
-				 * int idevent= rs1.getInt("id");
-				 */
-				Statement stmt2 = connection.createStatement();
-
-				// desmarcamos el evento asistido por el usuario.
-
-				StringBuilder sb2 = new StringBuilder(
-						"DELETE from assist where idevent='" + idevent + "';");
-
-				int rc = stmt2.executeUpdate(sb2.toString());
-				if (rc == 0) {
-
-					throw new WebApplicationException(Response
-							.status(Response.Status.NOT_FOUND)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.NOT_FOUND.getStatusCode(),
-									"Event assisted not found.", request))
-							.build());
-				}
-
-				stmt2.close();
-				connection.close();
-
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.INTERNAL_SERVER_ERROR
-										.getStatusCode(),
-								"Internal server error.", request)).build());
-			}
-
-		}
-	}
-
 	private List<Event> getEventList(String username, String kind, int eventid) {
-		if (security.isUserInRole("registered")
-		/* || security.isUserInRole("admin") */) {
+		if (security.isUserInRole("registered")) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
@@ -337,6 +165,154 @@ public class UserFavEventListResource {
 				.entity(APIErrorBuilder.buildError(
 						Response.Status.FORBIDDEN.getStatusCode(), "FORBIDDEN",
 						request)).build());
+	}
+
+	private void assistEvent(String username, int idevent) {
+		if (security.isUserInRole("registered")) {
+			if (security.isUserInRole("registered")
+					&& !security.getUserPrincipal().getName().equals(username)) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.FORBIDDEN.getStatusCode(),
+								"FORBIDDEN", request)).build());
+			}
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.SERVICE_UNAVAILABLE)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}			
+			try {
+				int iduser = obtainIdUser(username);
+				boolean isfav = isFav(idevent, iduser);
+				if (isfav == true) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.CONFLICT)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.CONFLICT.getStatusCode(),
+									"This event was already marked", request))
+							.build());
+				}
+				int idartist = obtainArtistInEvent(idevent);
+				boolean isfollowed = isFollowed(idartist, iduser);
+				if (isfollowed == false) {
+					throw new WebApplicationException(
+							Response.status(Response.Status.CONFLICT)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.CONFLICT
+													.getStatusCode(),
+											"You need to follow the Artist of this Event before",
+											request)).build());
+				}
+				Statement stmt = connection.createStatement();
+				StringBuilder sb = new StringBuilder(
+						"INSERT INTO assist (iduser,idevent) values (" + iduser
+								+ "," + idevent + ");");
+				System.out.println(sb);
+				int rc = stmt.executeUpdate(sb.toString());
+				if (rc == 0) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"Failed to mark this event", request))
+							.build());
+				}
+				stmt.close();
+				connection.close();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Internal server error.", request)).build());
+			}
+		}
+	}
+
+	private void deleteAssistEvent(String username, int idevent) {
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			if (security.isUserInRole("registered")
+					&& !security.getUserPrincipal().getName().equals(username)) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.FORBIDDEN.getStatusCode(),
+								"FORBIDDEN", request)).build());
+			}
+			Connection connection = null;
+
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.SERVICE_UNAVAILABLE)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+			try {
+
+				/*
+				 * Statement stmt = connection.createStatement(); StringBuilder
+				 * sb = new StringBuilder( "select id from user where name ='" +
+				 * username+ "'"); ResultSet rs =
+				 * stmt.executeQuery(sb.toString());
+				 * 
+				 * int iduser= rs.getInt("id");
+				 * 
+				 * Statement stmt1 = connection.createStatement();
+				 * 
+				 * StringBuilder sb1 = new StringBuilder(
+				 * "select event.id from event where (idkind= (select id from kind where name ='"
+				 * + eventkind+ "'))");
+				 * 
+				 * ResultSet rs1 = stmt1.executeQuery(sb1.toString());
+				 * 
+				 * int idevent= rs1.getInt("id");
+				 */
+				Statement stmt2 = connection.createStatement();
+
+				// desmarcamos el evento asistido por el usuario.
+
+				StringBuilder sb2 = new StringBuilder(
+						"DELETE from assist where idevent='" + idevent + "';");
+
+				int rc = stmt2.executeUpdate(sb2.toString());
+				if (rc == 0) {
+
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"Event assisted not found.", request))
+							.build());
+				}
+
+				stmt2.close();
+				connection.close();
+
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Internal server error.", request)).build());
+			}
+
+		}
 	}
 
 	public int obtainIdUser(String username) {
@@ -662,4 +638,87 @@ public class UserFavEventListResource {
 		}
 	}
 
+	public boolean isFollowed(int idartist, int iduser) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM follow WHERE idartist=1 AND iduser=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM follow WHERE idartist=" + idartist
+							+ " AND iduser=" + iduser + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				stmt.close();
+				connection.close();
+				return false;
+			} else {
+				stmt.close();
+				connection.close();
+				return true;
+			}
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	public int obtainArtistInEvent(int eventid) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT artist.id FROM artist INNER JOIN event on
+			// event.artist=artist.name AND event.id=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT artist.id FROM artist INNER JOIN event on event.artist=artist.name AND event.id="
+							+ eventid + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"This event have no artist", request)).build());
+			}
+			int artistid = rs.getInt("id");
+			System.out.println("Artist id: " + artistid);
+			stmt.close();
+			connection.close();
+			return artistid;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
 }

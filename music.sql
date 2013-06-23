@@ -235,6 +235,11 @@ SELECT follow.idartist, follow.iduser from follow inner join user on user.id=fol
 
 SELECT * FROM event INNER JOIN artist ON artist.name=event.artist WHERE artist.name=(SELECT name FROM artist WHERE id=1);
 
+SELECT artist.id FROM artist INNER JOIN event on event.artist=artist.name;
+
+SELECT artist.id FROM artist INNER JOIN event on event.artist=artist.name AND event.id=1;
+
+
 */
 
 
