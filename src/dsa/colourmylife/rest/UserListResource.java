@@ -44,7 +44,6 @@ public class UserListResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createUserJSON(User user) {
-
 		insertUser(user);
 		Response response = null;
 		try {
@@ -86,14 +85,13 @@ public class UserListResource {
 								"username used by other user.", request))
 						.build());
 			}
-			// CONSULTA: INSERT INTO user VALUES (NULL,"Rog5", MD5("test"),
+			// INSERT INTO user VALUES (NULL,"Rog5", MD5("test"),
 			// "rog@rog.com", "Roger", 1);
 			StringBuilder sb = new StringBuilder(
 					"INSERT INTO user (username,password,email,name) VALUES ('"
 							+ user.getUsername() + "',");
 			sb.append("MD5('" + user.getPassword() + "'),'" + user.getEmail()
 					+ "','" + user.getName() + "');");
-
 			Statement stmt = connection.createStatement();
 			int rc = stmt.executeUpdate(sb.toString());
 			if (rc == 0)
@@ -104,10 +102,6 @@ public class UserListResource {
 												.getStatusCode(),
 										"Error inserting values to database.",
 										request)).build());
-			/*
-			 * "INSERT INTO user-roles(userid,roleid,username,user-role) VALUES
-			 * (LAST-INSERT-ID(),1,1,'username','registered
-			 */
 			StringBuilder sb1 = new StringBuilder(
 					"INSERT INTO user_roles VALUES (LAST_INSERT_ID(),1,'"
 							+ user.getUsername() + "','registered');");
@@ -151,14 +145,12 @@ public class UserListResource {
 											.getStatusCode(),
 									"Service unavailable.", request)).build());
 		}
-
 		try {
 
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt // terminar query
+			ResultSet rs = stmt
 					.executeQuery("select * from user where username = '"
 							+ username + "';");
-
 			return rs.next();
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
@@ -201,7 +193,6 @@ public class UserListResource {
 				stmt.close();
 				connection.close();
 				return users;
-
 			} catch (SQLException e) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.INTERNAL_SERVER_ERROR)

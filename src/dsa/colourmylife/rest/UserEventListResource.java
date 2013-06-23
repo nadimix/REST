@@ -33,18 +33,15 @@ public class UserEventListResource {
 	protected HttpServletRequest request;
 	@Context
 	private SecurityContext security;
-
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Event> getEventListJSON(@PathParam("username") String username,
 			@QueryParam("kind") String kind) {
-		// All of this are Not NULL
 		return getEventList(username, kind);
 	}
 
 	private List<Event> getEventList(String username, String kind) {
-		if (security.isUserInRole("registered")
-		/* || security.isUserInRole("admin") */) {
+		if (security.isUserInRole("registered")) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
@@ -190,7 +187,6 @@ public class UserEventListResource {
 											.getStatusCode(),
 									"Service unavailable.", request)).build());
 		}
-
 		try {
 			Statement stmt = connection.createStatement();
 			// SELECT name FROM artist WHERE id=1;
@@ -300,7 +296,6 @@ public class UserEventListResource {
 										.getStatusCode(),
 								"Service unavailable.", request)).build());
 			}
-
 			try {
 				Statement stmt = connection.createStatement();
 				// SELECT id FROM kind WHERE name ='Concert';
@@ -345,7 +340,6 @@ public class UserEventListResource {
 											.getStatusCode(),
 									"Service unavailable.", request)).build());
 		}
-
 		try {
 			Statement stmt = connection.createStatement();
 			// SELECT name FROM kind WHERE id=1;
@@ -414,5 +408,4 @@ public class UserEventListResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
-
 }

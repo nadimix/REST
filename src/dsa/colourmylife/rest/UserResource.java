@@ -37,21 +37,13 @@ public class UserResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getUserJSON(@PathParam("username") String username,
 			@QueryParam("password") String password,
-			@QueryParam("option") int option) {// ,int control) {
-		/*
-		 * control=1 nos piden toda la información de un usuario control=0 log
-		 * in
-		 */
+			@QueryParam("option") int option) {
 		if (option == 1) {
 			return getUser(username);
 		} else {
 
 			return login(username, password);
 		}
-
-		// System.out.println("username= "+username+" password ="+password);
-		// return followartist(username,password);
-
 	}
 
 	@DELETE
@@ -67,9 +59,7 @@ public class UserResource {
 	public Response updateUserJSON(@PathParam("username") String username,
 			User user) {
 		updateUser(username, user);
-
 		Response response = null;
-
 		try {
 			response = Response.status(204)
 					.location(new URI("/users/" + username)).build();
@@ -82,8 +72,7 @@ public class UserResource {
 	}
 
 	private void updateUser(String username, User user) {
-		if (security.isUserInRole("registered")
-				/*|| security.isUserInRole("admin")*/) {
+		if (security.isUserInRole("registered")) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
@@ -97,9 +86,7 @@ public class UserResource {
 						.status(Response.Status.CONFLICT)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.CONFLICT.getStatusCode(),
-								"username don't exist", request))
-						.build());
-
+								"username don't exist", request)).build());
 			}
 			Connection connection = null;
 			try {
@@ -115,8 +102,6 @@ public class UserResource {
 			}
 
 			try {
-				// TODO check NOT NULL camps and check causes change password or
-				// another.
 				if (user.getName() != null && user.getEmail() != null
 						&& user.getPassword() != null) {
 					// UPDATE user SET password=MD5('test2'),
@@ -127,8 +112,6 @@ public class UserResource {
 					sb.append("email='" + user.getEmail() + "', ");
 					sb.append("name='" + user.getName() + "' ");
 					sb.append("WHERE username='" + username + "';");
-
-					// PRUEBA:
 					System.out.println(sb.toString());
 
 					Statement stmt = connection.createStatement();
@@ -140,17 +123,7 @@ public class UserResource {
 										Response.Status.NOT_FOUND
 												.getStatusCode(),
 										"User not found.", request)).build());
-
-					// // modificamos el username de la tabla user_roles
-					// StringBuilder sb1 = new StringBuilder(
-					// "update user_roles set ");
-					// sb1.append("username='" + user.getUsername() + "'");
-					// sb1.append(" where username='" + username + "'");
-					//
-					// Statement stmt1 = connection.createStatement();
-					// stmt1.executeUpdate(sb1.toString());
 				}
-
 			} catch (SQLException e) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -168,7 +141,7 @@ public class UserResource {
 		}
 	}
 
-	private boolean userExists(String username) {
+	public boolean userExists(String username) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -181,14 +154,11 @@ public class UserResource {
 											.getStatusCode(),
 									"Service unavailable.", request)).build());
 		}
-
 		try {
-
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt // terminar query
+			ResultSet rs = stmt
 					.executeQuery("select * from user where username = '"
 							+ username + "'");
-
 			return rs.next();
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
@@ -224,7 +194,6 @@ public class UserResource {
 								"Service unavailable.", request)).build());
 			}
 			try {
-				// Borramos al usuario de la tabla user.
 				Statement stmt = connection.createStatement();
 				int rc = stmt
 						.executeUpdate("DELETE from user where username = '"
@@ -235,8 +204,6 @@ public class UserResource {
 							.entity(APIErrorBuilder.buildError(
 									Response.Status.NOT_FOUND.getStatusCode(),
 									"User not found.", request)).build());
-
-				// Borramos al usuario de la tabla user_roles.
 				Statement stmt1 = connection.createStatement();
 				stmt1.executeUpdate("DELETE from user_roles where username = '"
 						+ username + "'");
@@ -249,57 +216,62 @@ public class UserResource {
 										.getStatusCode(),
 								"Internal server error.", request)).build());
 			}
+		} else {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
 		}
 	}
 
 	private User getUser(String username) {
 		Connection connection = null;
-			try {
-				connection = DataSourceSAP.getInstance().getDataSource()
-						.getConnection();
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.SERVICE_UNAVAILABLE)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.SERVICE_UNAVAILABLE
-										.getStatusCode(),
-								"Service unavailable.", request)).build());
-			}
-
-			try {
-				Statement stmt = connection.createStatement();
-				ResultSet rs = stmt
-						.executeQuery("select * from user where username = '"
-								+ username + "'");
-				if (!rs.next())
-					throw new WebApplicationException(Response
-							.status(Response.Status.NOT_FOUND)
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
 							.entity(APIErrorBuilder.buildError(
-									Response.Status.NOT_FOUND.getStatusCode(),
-									"User not found.", request)).build());
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
 
-				User user = new User();
-				user.setUserid(rs.getInt("id"));
-				user.setUsername(rs.getString("username"));
-				user.setPassword(rs.getString("password"));
-				user.setEmail(rs.getString("email"));
-				user.setName(rs.getString("name"));
-				stmt.close();
-				connection.close();
-				return user;
-			} catch (SQLException e) {
+		try {
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt
+					.executeQuery("select * from user where username = '"
+							+ username + "'");
+			if (!rs.next())
 				throw new WebApplicationException(Response
-						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.status(Response.Status.NOT_FOUND)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.INTERNAL_SERVER_ERROR
-										.getStatusCode(),
-								"Error accessing to database.", request))
-						.build());
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"User not found.", request)).build());
 
-			}
+			User user = new User();
+			user.setUserid(rs.getInt("id"));
+			user.setUsername(rs.getString("username"));
+			user.setPassword(rs.getString("password"));
+			user.setEmail(rs.getString("email"));
+			user.setName(rs.getString("name"));
+			stmt.close();
+			connection.close();
+			return user;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+
+		}
 	}
 
-	private User login(String username, String password) {		
+	private User login(String username, String password) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -313,31 +285,23 @@ public class UserResource {
 									"Service unavailable.", request)).build());
 		}
 		try {
-
-			// miramos si ese usuario esta registrado.
 			Statement stmt = connection.createStatement();
 			ResultSet rs = stmt
 					.executeQuery("select * from user where username = '"
 							+ username + "'");
-			if (rs.next())// si existe ese usuario
-			{
+			if (rs.next()) {
 				User user = new User();
 				user.setUserid(rs.getInt("id"));
 				user.setUsername(rs.getString("username"));
 				user.setPassword(rs.getString("password"));
 				user.setEmail(rs.getString("email"));
 				user.setName(rs.getString("name"));
-
-				// Comprobamos que el nombre de usuario y la contraseña sean
-				// las
-				// correctas.
 				Statement stmt1 = connection.createStatement();
 				StringBuilder sb = new StringBuilder(
 						"select username from user where username='"
 								+ user.getUsername() + "' and password =MD5('"
 								+ password + "')");
 				ResultSet rs1 = stmt1.executeQuery(sb.toString());
-
 				if (!rs1.next()) {
 					throw new WebApplicationException(Response
 							.status(Response.Status.CONFLICT)
@@ -346,9 +310,7 @@ public class UserResource {
 									"Password or username not correct.",
 									request)).build());
 				}
-
 				String username1 = rs1.getString("username");
-
 				if (!username.equals(username1)) {
 					throw new WebApplicationException(Response
 							.status(Response.Status.CONFLICT)
@@ -357,9 +319,6 @@ public class UserResource {
 									"Password or username not correct.",
 									request)).build());
 				}
-
-				// se ha registrado como administrador
-
 				if (username.equals("admin")) {
 					throw new WebApplicationException(Response
 							.status(Response.Status.CREATED)
@@ -368,23 +327,12 @@ public class UserResource {
 									"user login as admin.", request)).build());
 
 				}
-
-				/*
-				 * Comprobamos con la query si sigue algun artista; Si sigue
-				 * algun artista ya se ha logueado anteriormente Si NO no se ha
-				 * logueado anteriormente
-				 */
-				// obtenemos el id del usuario:
-
 				Statement stmt4 = connection.createStatement();
 				ResultSet rs3 = stmt4
 						.executeQuery("select id from user where username = '"
 								+ username + "'");
 				rs3.next();
-
 				int iduser = rs3.getInt("id");
-
-				// comprobamos si ese usuario sigue a algun artista.
 				Statement stmt2 = connection.createStatement();
 				ResultSet rs2 = stmt2
 						.executeQuery("select idartist from follow where iduser= "
@@ -397,7 +345,6 @@ public class UserResource {
 									"The user is following artists.", request))
 							.build());
 				}
-
 				if (!rs2.next()) {
 
 					throw new WebApplicationException(Response
@@ -406,14 +353,12 @@ public class UserResource {
 									Response.Status.ACCEPTED.getStatusCode(),
 									"The user is not following any artist.",
 									request)).build());
-
 				}
 				stmt.close();
 				stmt1.close();
 				stmt2.close();
 				stmt4.close();
 				return user;
-
 			} else {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
@@ -421,7 +366,6 @@ public class UserResource {
 								Response.Status.NOT_FOUND.getStatusCode(),
 								"User not found.", request)).build());
 			}
-
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
