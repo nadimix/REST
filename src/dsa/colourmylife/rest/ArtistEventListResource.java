@@ -30,19 +30,6 @@ import dsa.colourmylife.rest.util.DataSourceSAP;
 
 @Path("/artists/{artist}/events")
 public class ArtistEventListResource {
-	// ArtistEventListResource: ./artists/{artist}/events
-	// GET → Lista eventos.
-	// POST → Crear eventos.
-	// id int(11) NOT NULL AUTO_INCREMENT,
-	// idkind int(11) NOT NULL,
-	// artist varchar(50) NOT NULL,
-	// date datetime default NULL,
-	// place varchar(128) NULL,
-	// city varchar(50) NOT NULL,
-	// country varchar(50) NOT NULL,
-	// info varchar(150),
-	// insertdate datetime default current_timestamp,
-
 	@Context
 	private UriInfo uri;
 	@Context

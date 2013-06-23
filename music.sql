@@ -241,6 +241,8 @@ SELECT artist.id FROM artist INNER JOIN event on event.artist=artist.name AND ev
 
 DELETE FROM assist WHERE idevent=1 and iduser=1;
 
+SELECT artist.id, artist.name, artist.idgenre1, artist.idgenre2, artist.info FROM artist INNER JOIN follow on follow.idartist=artist.id and follow.iduser=1 order by name;
+
 */
 
 
