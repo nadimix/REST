@@ -9,6 +9,7 @@ public class Artist {
 	private String info;
 	private String genre;
 	private String genre2;
+	private boolean followed;
 
 	public int getArtistId() {
 		return artistId;
@@ -64,5 +65,13 @@ public class Artist {
 
 	public void setInfo(String info) {
 		this.info = info;
+	}
+
+	public boolean isFollowed() {
+		return followed;
+	}
+
+	public void setFollowed(boolean followed) {
+		this.followed = followed;
 	}
 }

@@ -15,11 +15,10 @@ public class Event {
 	private String country;
 	private String info;
 	private String insertdate;
-
-	// Hacer métodos que permitan obtener kind y artist a partir de sus Id aquí
-	// dentro?
+ 
 	private String kind;
 	private String link;
+	private boolean fav;
 	private String sameCountryLink;
 	private String sameKindLink;
 
@@ -126,6 +125,14 @@ public class Event {
 
 	public void setSameCountryLink(String sameCountryLink) {
 		this.sameCountryLink = sameCountryLink;
+	}
+
+	public boolean isFav() {
+		return fav;
+	}
+
+	public void setFav(boolean fav) {
+		this.fav = fav;
 	}
 
 }

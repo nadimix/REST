@@ -39,18 +39,13 @@ public class UserFavEventListResource {
 	@Context
 	private SecurityContext security;
 
-	/*
-	 * RECURSOS: POST: añadir evento marcado a usuario DELETE: desmarcar evento
-	 * marcado por el usuario
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Event> getEventListJSON(@PathParam("username") String username,
 			@QueryParam("kind") String kind, @QueryParam("idevent") int eventid) {
-		// All of this are Not NULL
 		return getEventList(username, kind, eventid);
-	}	
-	
+	}
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -64,7 +59,7 @@ public class UserFavEventListResource {
 			// PREGUNTAR QUE LOCATION TENEMOS QUE PONER DEL RESPONSE STATUS!!
 
 			response = Response.status(204)
-					.location(new URI("/users/{" + username + "}/events/fav"))
+					.location(new URI("/users/" + username + "/events/fav"))
 					.build();
 
 		} catch (URISyntaxException e) {
@@ -85,7 +80,7 @@ public class UserFavEventListResource {
 
 	private void assistEvent(String username, int idevent) {
 		if (security.isUserInRole("registered")
-				|| security.isUserInRole("admin")) {
+		/* || security.isUserInRole("admin") */) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
@@ -118,6 +113,7 @@ public class UserFavEventListResource {
 				Statement stmt = connection.createStatement();
 				StringBuilder sb = new StringBuilder(
 						"select * from user where username ='" + username + "'");
+				System.out.println(sb);
 				ResultSet rs = stmt.executeQuery(sb.toString());
 
 				rs.next();
@@ -130,11 +126,11 @@ public class UserFavEventListResource {
 				StringBuilder sb1 = new StringBuilder(
 						"SELECT id from assist where iduser=" + iduser
 								+ " and idevent='" + idevent + "';");
+				System.out.println(sb1);
 
 				ResultSet rs2 = stmt1.executeQuery(sb1.toString());
 
 				if (rs2.next()) {
-
 					throw new WebApplicationException(
 							Response.status(Response.Status.CONFLICT)
 									.entity(APIErrorBuilder.buildError(
@@ -145,15 +141,13 @@ public class UserFavEventListResource {
 				}
 
 				Statement stmt2 = connection.createStatement();
-
 				// marcamos el evento como asistido por el usuario.
 				StringBuilder sb2 = new StringBuilder(
-						"INSERT INTO  assist (iduser,idevent) values ("
-								+ iduser + "," + idevent + ");");
-
+						"INSERT INTO assist (iduser,idevent) values (" + iduser
+								+ "," + idevent + ");");
+				System.out.println(sb2);
 				int rc = stmt.executeUpdate(sb2.toString());
 				if (rc == 0) {
-
 					throw new WebApplicationException(Response
 							.status(Response.Status.NOT_FOUND)
 							.entity(APIErrorBuilder.buildError(
@@ -161,7 +155,6 @@ public class UserFavEventListResource {
 									"Error al marcar el evento como asistido.",
 									request)).build());
 				}
-
 				stmt.close();
 				stmt1.close();
 				stmt2.close();
@@ -255,10 +248,10 @@ public class UserFavEventListResource {
 
 		}
 	}
+
 	private List<Event> getEventList(String username, String kind, int eventid) {
-		// TODO this method
 		if (security.isUserInRole("registered")
-				|| security.isUserInRole("admin")) {
+		/* || security.isUserInRole("admin") */) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
 				throw new WebApplicationException(Response
@@ -287,16 +280,14 @@ public class UserFavEventListResource {
 				for (Event E : idEventAssist) {
 					Statement stmt = connection.createStatement();
 					if (kind == null) {
-						sb = new StringBuilder(
-								"SELECT * FROM event WHERE id="
-										+ E.getEventId() + ";");
+						sb = new StringBuilder("SELECT * FROM event WHERE id="
+								+ E.getEventId() + ";");
 						System.out.println(sb);
 					} else {
 						int kindId = obtainKindId(kind);
-						sb = new StringBuilder(
-								"SELECT * FROM event WHERE id='"
-										+ E.getEventId() + " AND idkind="
-										+ kindId + ";");
+						sb = new StringBuilder("SELECT * FROM event WHERE id='"
+								+ E.getEventId() + " AND idkind=" + kindId
+								+ ";");
 						System.out.println(sb);
 					}
 					ResultSet rs = stmt.executeQuery(sb.toString());
@@ -313,6 +304,8 @@ public class UserFavEventListResource {
 						event.setCountry(rs.getString("country"));
 						event.setInfo(rs.getString("info"));
 						event.setInsertdate(rs.getString("insertdate"));
+						boolean fav = isFav(event.getEventId(), iduser);
+						event.setFav(fav);
 						event.setLink(uri.getBaseUri().toString() + "artists/"
 								+ event.getArtist() + "/events/"
 								+ event.getEventId());
@@ -339,7 +332,11 @@ public class UserFavEventListResource {
 						.build());
 			}
 		}
-		return null;
+		throw new WebApplicationException(Response
+				.status(Response.Status.FORBIDDEN)
+				.entity(APIErrorBuilder.buildError(
+						Response.Status.FORBIDDEN.getStatusCode(), "FORBIDDEN",
+						request)).build());
 	}
 
 	public int obtainIdUser(String username) {
@@ -582,8 +579,8 @@ public class UserFavEventListResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
-	
-	public List<Event> getEventAssistList(int userid){
+
+	public List<Event> getEventAssistList(int userid) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -599,7 +596,7 @@ public class UserFavEventListResource {
 
 		try {
 			Statement stmt = connection.createStatement();
-			//SELECT idevent FROM assist WHERE iduser=1;
+			// SELECT idevent FROM assist WHERE iduser=1;
 			StringBuilder sb = new StringBuilder(
 					"SELECT idevent FROM assist WHERE iduser=" + userid + ";");
 			System.out.println(sb);
@@ -622,8 +619,47 @@ public class UserFavEventListResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
-		
+
 	}
 
+	public boolean isFav(int idevent, int iduser) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM assist WHERE idevent=1 AND iduser=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM assist WHERE idevent=" + idevent
+							+ " AND iduser=" + iduser + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				stmt.close();
+				connection.close();
+				return false;
+			} else {
+				stmt.close();
+				connection.close();
+				return true;
+			}
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
 
 }

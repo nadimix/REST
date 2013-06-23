@@ -150,17 +150,30 @@ INSERT INTO genre VALUES (NULL, "Classic");
 INSERT INTO genre VALUES (NULL, "Electronic");
 
 INSERT INTO event VALUES (NULL, 1, "Florence", "2013-09-20 22:00:00", "Palau Sant Jordi", "Barcelona", "Catalunya", "Awesome!", NOW());
-INSERT INTO event VALUES (NULL, 1, "Florence", "2013-09-21 22:00:00", "Palau Joventut", "Badalona", "Catalunya", "Awesome++!", NOW());
+INSERT INTO event VALUES (NULL, 1, "Robbie Williams", "2013-09-21 22:00:00", "Palau Joventut", "Badalona", "Catalunya", "Awesome++!", NOW());
 INSERT INTO event VALUES (NULL, 1, "Daft Punk", "2013-09-21 22:45:00", "Palau Joventut", "Badalona", "Catalunya", "Awesome++!", NOW());
 
+INSERT INTO event VALUES (NULL, 2, "Robbie Williams", "2013-09-20 22:00:00", NULL, NULL, "Catalunya", "Nuevo disco", NOW());
+INSERT INTO event VALUES (NULL, 2, "The XX", "2013-09-20 22:00:00", NULL, NULL, "Catalunya", "Nuevo disco", NOW()); 
+INSERT INTO event VALUES (NULL, 2, "Florence", "2013-09-20 22:00:00", NULL, NULL, "Catalunya", "Nuevo disco", NOW()); 
+
+INSERT INTO event VALUES (NULL, 3, "Florence", "2013-09-20 22:00:00", NULL, NULL, "Spain", "Nuevo video", NOW());
+INSERT INTO event VALUES (NULL, 3, "Daft Punk", "2013-09-20 22:00:00", NULL, NULL, "Spain", "Nuevo video", NOW());
+INSERT INTO event VALUES (NULL, 3, "The XX", "2013-09-20 22:00:00", NULL, NULL, "Spain", "Nuevo video", NOW());
 
 INSERT INTO follow VALUES (NULL, 1, 1);
 INSERT INTO follow VALUES (NULL, 1, 2);
+INSERT INTO follow VALUES (NULL, 1, 3);
+INSERT INTO follow VALUES (NULL, 1, 5);
+
 INSERT INTO follow VALUES (NULL, 2, 3);
 INSERT INTO follow VALUES (NULL, 3, 4);
 INSERT INTO follow VALUES (NULL, 4, 1);
 INSERT INTO follow VALUES (NULL, 4, 4);
 
+INSERT INTO assist VALUES(NULL,1,1);
+INSERT INTO assist VALUES(NULL,1,2);
+INSERT INTO assist VALUES(NULL,2,3);
 
 /* Another: working
 
@@ -215,6 +228,12 @@ INSERT INTO assist VALUES(NULL,1,2);
 INSERT INTO assist VALUES(NULL,2,3);
 
 SELECT idevent FROM assist WHERE iduser=1;
+
+SELECT follow.idartist, follow.iduser FROM follow INNER JOIN user ON user.id=follow.iduser ORDER BY user.id;
+
+SELECT follow.idartist, follow.iduser from follow inner join user on user.id=follow.iduser where user.id=1;
+
+SELECT * FROM event INNER JOIN artist ON artist.name=event.artist WHERE artist.name=(SELECT name FROM artist WHERE id=1);
 
 */
 
