@@ -49,7 +49,7 @@ public class ArtistListResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Artist> getArtistListJSON(@QueryParam("username") String username) {
+	public List<Artist> getArtistListJSON(@QueryParam("user") String username) {
 		return getArtistList(username);
 	}
 

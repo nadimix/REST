@@ -46,7 +46,7 @@ public class ArtistResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Artist getArtistJSON(@PathParam("artist") String name, @QueryParam("username") String username) {
+	public Artist getArtistJSON(@PathParam("artist") String name, @QueryParam("user") String username) {
 		return getArtist(name, username);
 	}
 
