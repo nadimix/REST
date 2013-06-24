@@ -39,16 +39,15 @@ public class UserArtistListResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Artist> getFollowedArtistJSON(
 			@PathParam("username") String username) {
-		return getArtistsFollowed(username);
+		return getFollowedArtist(username);
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response insertFollowedArtistJSON(
-			@PathParam("username") String username,
+	public Response followArtistJSON(@PathParam("username") String username,
 			@QueryParam("idartist") int idartist) {
-		insertFollowedArtist(username, idartist);
+		followArtist(username, idartist);
 		Response response = null;
 		try {
 			response = Response.status(204)
@@ -62,14 +61,13 @@ public class UserArtistListResource {
 
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteFollowedArtistJSON(
-			@PathParam("username") String username,
+	public Response unFollowArtistJSON(@PathParam("username") String username,
 			@QueryParam("idartist") int idartist) {
-		deleteFollowedArtist(username, idartist);
+		unFollowArtist(username, idartist);
 		return Response.status(204).build();
 	}
 
-	private List<Artist> getArtistsFollowed(String username) {
+	private List<Artist> getFollowedArtist(String username) {
 		if (security.isUserInRole("registered")) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
@@ -114,7 +112,7 @@ public class UserArtistListResource {
 		}
 	}
 
-	private void deleteFollowedArtist(String username, int idartist) {
+	private void followArtist(String username, int idartist) {
 		if (security.isUserInRole("registered")) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
@@ -137,29 +135,42 @@ public class UserArtistListResource {
 								"Service unavailable.", request)).build());
 			}
 			try {
+				int iduser = obtainIdUser(username);
+				boolean exist = artistExist(idartist);
+				if(exist == false){
+					throw new WebApplicationException(
+							Response.status(Response.Status.CONFLICT)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.CONFLICT
+													.getStatusCode(),
+											"This artist doesn't exist",
+											request)).build());
+				}
+				boolean foll = isFollowed(idartist, iduser);
+				if (foll == true) {
+					throw new WebApplicationException(
+							Response.status(Response.Status.CONFLICT)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.CONFLICT
+													.getStatusCode(),
+											"This artist was already followed",
+											request)).build());
+				}
 				Statement stmt = connection.createStatement();
 				StringBuilder sb = new StringBuilder(
-						"select id from user where username ='" + username
-								+ "';");
-				ResultSet rs = stmt.executeQuery(sb.toString());
-				rs.next();
-				int iduser = rs.getInt("id");
-				System.out.println("id artista= " + idartist);
-				Statement stmt2 = connection.createStatement();
-				StringBuilder sb2 = new StringBuilder(
-						"DELETE from follow where idartist=" + idartist
-								+ " and iduser =" + iduser + ";");
-				int rc = stmt2.executeUpdate(sb2.toString());
+						"INSERT INTO  follow (iduser,idartist) values ("
+								+ iduser + ", " + idartist + ");");
+				System.out.println(sb.toString());
+				int rc = stmt.executeUpdate(sb.toString());
 				if (rc == 0) {
 					throw new WebApplicationException(Response
 							.status(Response.Status.NOT_FOUND)
 							.entity(APIErrorBuilder.buildError(
 									Response.Status.NOT_FOUND.getStatusCode(),
-									"Follow artist not found.", request))
+									"Failed to follow this artist", request))
 							.build());
 				}
 				stmt.close();
-				stmt2.close();
 				connection.close();
 			} catch (SQLException e) {
 				throw new WebApplicationException(Response
@@ -178,7 +189,7 @@ public class UserArtistListResource {
 		}
 	}
 
-	private void insertFollowedArtist(String username, int idartist) {
+	private void unFollowArtist(String username, int idartist) {
 		if (security.isUserInRole("registered")) {
 			if (security.isUserInRole("registered")
 					&& !security.getUserPrincipal().getName().equals(username)) {
@@ -201,41 +212,41 @@ public class UserArtistListResource {
 								"Service unavailable.", request)).build());
 			}
 			try {
-				Statement stmt = connection.createStatement();
-				StringBuilder sb = new StringBuilder(
-						"select id from user where username ='" + username
-								+ "';");
-				ResultSet rs = stmt.executeQuery(sb.toString());
-				rs.next();
-				int iduser = rs.getInt("id");
-				Statement stmt1 = connection.createStatement();
-				StringBuilder sb1 = new StringBuilder(
-						"SELECT id from follow where iduser='" + iduser
-								+ "' and idartist='" + idartist + "';");
-				ResultSet rs2 = stmt1.executeQuery(sb1.toString());
-				if (rs2.next()) {
+				int iduser = obtainIdUser(username);
+				boolean exist = artistExist(idartist);
+				if(exist == false){
+					throw new WebApplicationException(
+							Response.status(Response.Status.CONFLICT)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.CONFLICT
+													.getStatusCode(),
+											"This artist doesn't exist",
+											request)).build());
+				}
+				boolean foll = isFollowed(idartist, iduser);
+				if (foll == false) {
 					throw new WebApplicationException(Response
 							.status(Response.Status.CONFLICT)
 							.entity(APIErrorBuilder.buildError(
 									Response.Status.CONFLICT.getStatusCode(),
-									"Ya estas siguiendo a ese artista.",
+									"You need to follow this artist first",
 									request)).build());
 				}
-				Statement stmt2 = connection.createStatement();
-				StringBuilder sb2 = new StringBuilder(
-						"INSERT INTO  follow (iduser,idartist) values ('"
-								+ iduser + "', '" + idartist + "');");
-				int rc = stmt2.executeUpdate(sb2.toString());
+				Statement stmt = connection.createStatement();
+				StringBuilder sb = new StringBuilder(
+						"DELETE from follow where idartist=" + idartist
+								+ " and iduser =" + iduser + ";");
+				System.out.println(sb.toString());
+				int rc = stmt.executeUpdate(sb.toString());
 				if (rc == 0) {
-					throw new WebApplicationException(Response
-							.status(Response.Status.NOT_FOUND)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.NOT_FOUND.getStatusCode(),
-									"Error al marcar el artista como seguido.",
-									request)).build());
+					throw new WebApplicationException(
+							Response.status(Response.Status.NOT_FOUND)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.NOT_FOUND
+													.getStatusCode(),
+											"Failled to unfollow this artist",
+											request)).build());
 				}
-				stmt2.close();
-				stmt1.close();
 				stmt.close();
 				connection.close();
 			} catch (SQLException e) {
@@ -338,7 +349,46 @@ public class UserArtistListResource {
 		}
 	}
 
-	public List<Artist> getArtistFollowed(int userId) {
+	public boolean artistExist(int idartist) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM artist WHERE id=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM artist WHERE id=" + idartist + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				stmt.close();
+				connection.close();
+				return false;
+			} else {
+				stmt.close();
+				connection.close();
+				return true;
+			}
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	public List<Artist> getArtistFollowed(int iduser) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -360,18 +410,32 @@ public class UserArtistListResource {
 					"SELECT artist.id, artist.name, artist.idgenre1, artist.idgenre2, ");
 			sb.append("artist.info FROM artist INNER JOIN follow on ");
 			sb.append("follow.idartist=artist.id and ");
-			sb.append("follow.iduser=" + userId + " order by name;");
+			sb.append("follow.iduser=" + iduser + " order by name;");
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
 			List<Artist> artistList = new ArrayList<>();
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
+			}
 			while (rs.next()) {
 				Artist artist = new Artist();
 				artist.setArtistid(rs.getInt("id"));
 				artist.setName(rs.getString("name"));
+				System.out.println(artist.getName());
 				artist.setGenreId(rs.getInt("idgenre1"));
 				artist.setGenre2Id(rs.getInt("idgenre2"));
 				artist.setInfo(rs.getString("info"));
-				boolean foll = isFollowed(artist.getArtistId(), userId);
+				String genre1 = obtainGenre(artist.getGenreId());
+				artist.setGenre(genre1);
+				if (artist.getGenre2Id() != 0) {
+					String genre2 = obtainGenre(artist.getGenre2Id());
+					artist.setGenre2(genre2);
+				}
+				boolean foll = isFollowed(artist.getArtistId(), iduser);
 				artist.setFollowed(foll);
 				artistList.add(artist);
 			}
@@ -386,5 +450,47 @@ public class UserArtistListResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
+	}
+
+	public String obtainGenre(int genreid) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT name FROM genre WHERE id=1;
+			ResultSet rs = stmt.executeQuery("SELECT name FROM genre WHERE id="
+					+ genreid + ";");
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Genre not found.", request)).build());
+			}
+			String genre = rs.getString("name");
+			System.out.println(genre);
+			stmt.close();
+			connection.close();
+			return genre;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+
 	}
 }

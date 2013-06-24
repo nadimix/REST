@@ -15,6 +15,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -45,8 +46,8 @@ public class ArtistResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Artist getArtistJSON(@PathParam("artist") String name) {
-		return getArtist(name);
+	public Artist getArtistJSON(@PathParam("artist") String name, @QueryParam("username") String username) {
+		return getArtist(name, username);
 	}
 
 	@DELETE
@@ -73,7 +74,7 @@ public class ArtistResource {
 		return response;
 	}
 
-	private Artist getArtist(String name) {
+	private Artist getArtist(String name, String username) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -100,18 +101,21 @@ public class ArtistResource {
 								Response.Status.NOT_FOUND.getStatusCode(),
 								"Artist not found.", request)).build());
 			}
-
 			Artist artist = new Artist();
 			artist.setArtistid(rs.getInt("id"));
 			artist.setName(rs.getString("name"));
 			artist.setGenreId(rs.getInt("idgenre1"));
 			artist.setGenre2Id(rs.getInt("idgenre2"));
 			artist.setInfo(rs.getString("info"));
+			if(username!=null){
+				int iduser = obtainIdUser(username);
+				boolean foll = isFollowed(artist.getArtistId(), iduser);
+				artist.setFollowed(foll);
+			}
 			stmt.close();
 			connection.close();
 			String genre1 = obtainGenre(artist.getGenreId());
 			artist.setGenre(genre1);
-			// Genre2 can be null
 			if (artist.getGenre2Id() != 0) {
 				String genre2 = obtainGenre(artist.getGenre2Id());
 				artist.setGenre2(genre2);
@@ -147,6 +151,7 @@ public class ArtistResource {
 											.getStatusCode(),
 									"Service unavailable.", request)).build());
 		}
+		// TODO check user exist
 		try {
 			Statement stmt = connection.createStatement();
 			// DELETE FROM artist WHERE name ='Florence';
@@ -261,7 +266,88 @@ public class ArtistResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
-
 	}
+	
+	public int obtainIdUser(String username) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
 
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT id FROM user WHERE username='ubuntu';
+			StringBuilder sb = new StringBuilder(
+					"SELECT id FROM user WHERE username='" + username + "';");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"User not found.", request)).build());
+			}
+			int id = rs.getInt("id");
+			System.out.println("User id: " + id);
+			stmt.close();
+			connection.close();
+			return id;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+	
+	public boolean isFollowed(int idartist, int iduser) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM follow WHERE idartist=1 AND iduser=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM follow WHERE idartist=" + idartist
+							+ " AND iduser=" + iduser + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				stmt.close();
+				connection.close();
+				return false;
+			} else {
+				stmt.close();
+				connection.close();
+				return true;
+			}
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
 }

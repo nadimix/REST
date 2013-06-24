@@ -430,6 +430,13 @@ public class UserFavEventListResource {
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
 			List<Artist> artistList = new ArrayList<>();
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
+			}
 			while (rs.next()) {
 				Artist artist = new Artist();
 				artist.setArtistid(rs.getInt("idartist"));
@@ -585,6 +592,13 @@ public class UserFavEventListResource {
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
 			List<Event> eventAssistList = new ArrayList<>();
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Event not found.", request)).build());
+			}
 			while (rs.next()) {
 				Event event = new Event();
 				event.setEventId(rs.getInt("idevent"));

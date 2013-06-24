@@ -15,6 +15,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -48,8 +49,8 @@ public class ArtistListResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Artist> getArtistListJSON() {
-		return getArtistList();
+	public List<Artist> getArtistListJSON(@QueryParam("username") String username) {
+		return getArtistList(username);
 	}
 
 	@POST
@@ -156,7 +157,7 @@ public class ArtistListResource {
 		}
 	}
 
-	private List<Artist> getArtistList() {
+	private List<Artist> getArtistList(String username) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -189,6 +190,11 @@ public class ArtistListResource {
 				if (artist.getGenre2Id() != 0) {
 					String genre2 = obtainGenre(artist.getGenre2Id());
 					artist.setGenre2(genre2);
+				}
+				if(username!=null){
+					int iduser = obtainIdUser(username);
+					boolean foll = isFollowed(artist.getArtistId(), iduser);
+					artist.setFollowed(foll);
 				}
 				artistList.add(artist);
 				System.out.println("Artist: "+artist.getName());
@@ -284,5 +290,87 @@ public class ArtistListResource {
 							"Error accessing to database.", request)).build());
 		}
 
+	}
+	public int obtainIdUser(String username) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT id FROM user WHERE username='ubuntu';
+			StringBuilder sb = new StringBuilder(
+					"SELECT id FROM user WHERE username='" + username + "';");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"User not found.", request)).build());
+			}
+			int id = rs.getInt("id");
+			System.out.println("User id: " + id);
+			stmt.close();
+			connection.close();
+			return id;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+	
+	public boolean isFollowed(int idartist, int iduser) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM follow WHERE idartist=1 AND iduser=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM follow WHERE idartist=" + idartist
+							+ " AND iduser=" + iduser + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				stmt.close();
+				connection.close();
+				return false;
+			} else {
+				stmt.close();
+				connection.close();
+				return true;
+			}
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
 	}
 }
