@@ -199,6 +199,12 @@ public class ArtistListResource {
 				artistList.add(artist);
 				System.out.println("Artist: "+artist.getName());
 			}
+			if (artistList.size() == 0)
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
 			stmt.close();
 			connection.close();
 			return artistList;

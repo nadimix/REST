@@ -62,7 +62,7 @@
 		<web-resource-collection>
 			<web-resource-name>UserEventListResource</web-resource-name>
 			<url-pattern>/api/users/*</url-pattern>
-			<http-method>GET</http-method>
+<!-- 			<http-method>GET</http-method> -->
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>registered</role-name>
@@ -74,7 +74,7 @@
 		<web-resource-collection>
 			<web-resource-name>UserFavEventListResource</web-resource-name>
 			<url-pattern>/api/users/*</url-pattern>
-			<http-method>GET</http-method>
+<!-- 			<http-method>GET</http-method> -->
 			<http-method>POST</http-method>
 			<http-method>DELETE</http-method>
 		</web-resource-collection>
@@ -88,7 +88,7 @@
 		<web-resource-collection>
 			<web-resource-name>UserArtistListResource</web-resource-name>
 			<url-pattern>/api/users/*</url-pattern>
-			<http-method>GET</http-method>
+<!-- 			<http-method>GET</http-method> -->
 			<http-method>POST</http-method>
 			<http-method>DELETE</http-method>
 		</web-resource-collection>

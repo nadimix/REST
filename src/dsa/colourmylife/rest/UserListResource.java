@@ -190,6 +190,13 @@ public class UserListResource {
 					user.setEmail(rs.getString("email"));
 					users.add(user);
 				}
+				if(users.size() == 0){
+					throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"User not found.", request)).build());
+				}
 				stmt.close();
 				connection.close();
 				return users;

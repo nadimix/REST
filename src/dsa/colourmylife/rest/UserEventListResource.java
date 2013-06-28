@@ -110,6 +110,13 @@ public class UserEventListResource {
 								+ "/events?country=" + event.getCountry());
 						artistEventList.add(event);
 					}
+					if (artistEventList.size() == 0) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Event not found.", request)).build());
+			}
 					stmt.close();
 				}
 				connection.close();
@@ -247,6 +254,13 @@ public class UserEventListResource {
 				artist.setName(name);
 				System.out.println("Artist: " + artist.getName());
 				artistList.add(artist);
+			}
+			if(artistList.size() == 0){				
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
 			}
 			stmt.close();
 			connection.close();

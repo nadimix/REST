@@ -146,6 +146,13 @@ public class UserFavEventListResource {
 								+ "/events?country=" + event.getCountry());
 						eventAssist.add(event);
 					}
+					if (eventAssist.size() == 0) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Event not found.", request)).build());
+			}
 					stmt.close();
 				}
 				connection.close();
@@ -430,13 +437,6 @@ public class UserFavEventListResource {
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
 			List<Artist> artistList = new ArrayList<>();
-			if (!rs.next()) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
-			}
 			while (rs.next()) {
 				Artist artist = new Artist();
 				artist.setArtistid(rs.getInt("idartist"));
@@ -446,6 +446,13 @@ public class UserFavEventListResource {
 				artist.setName(name);
 				System.out.println("Artist: " + artist.getName());
 				artistList.add(artist);
+			}
+			if (artistList.size() == 0) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
 			}
 			stmt.close();
 			connection.close();
@@ -592,19 +599,18 @@ public class UserFavEventListResource {
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
 			List<Event> eventAssistList = new ArrayList<>();
-			if (!rs.next()) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Event not found.", request)).build());
-			}
 			while (rs.next()) {
 				Event event = new Event();
 				event.setEventId(rs.getInt("idevent"));
 				System.out.println("Eventid Assist: " + event.getEventId());
 				eventAssistList.add(event);
 			}
+			if (eventAssistList.size() == 0)
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"No Event Assist List found.", request)).build());
 			stmt.close();
 			connection.close();
 			return eventAssistList;

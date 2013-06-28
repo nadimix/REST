@@ -413,14 +413,8 @@ public class UserArtistListResource {
 			sb.append("follow.iduser=" + iduser + " order by name;");
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
-			List<Artist> artistList = new ArrayList<>();
-			if (!rs.next()) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
-			}
+			List<Artist> artistList = new ArrayList<>();			
+			int i =0;
 			while (rs.next()) {
 				Artist artist = new Artist();
 				artist.setArtistid(rs.getInt("id"));
@@ -438,7 +432,15 @@ public class UserArtistListResource {
 				boolean foll = isFollowed(artist.getArtistId(), iduser);
 				artist.setFollowed(foll);
 				artistList.add(artist);
+				i++;
 			}
+			if (i==0) {
+							throw new WebApplicationException(Response
+									.status(Response.Status.NOT_FOUND)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.NOT_FOUND.getStatusCode(),
+											"Artist not found.", request)).build());
+						}
 			stmt.close();
 			connection.close();
 			return artistList;
