@@ -55,6 +55,62 @@ public class UserListResource {
 		return response;
 	}
 
+	private List<User> getUsers() {
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.SERVICE_UNAVAILABLE)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+			try {
+				Statement stmt = connection.createStatement();
+				ResultSet rs = stmt.executeQuery("select * from user;");
+				List<User> users = new ArrayList<>();
+				while (rs.next()) {
+					User user = new User();
+					user.setUserid(rs.getInt("id"));
+					user.setName(rs.getString("name"));
+					user.setUsername(rs.getString("username"));
+					user.setPassword(rs.getString("password"));
+					user.setEmail(rs.getString("email"));
+					users.add(user);
+				}
+				if(users.size() == 0){
+					throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"User not found.", request)).build());
+				}
+				stmt.close();
+				connection.close();
+				return users;
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			}
+		} else {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
+		}
+	}
+
 	private void insertUser(User user) {
 		Connection connection = null;
 		try {
@@ -159,62 +215,6 @@ public class UserListResource {
 							Response.Status.INTERNAL_SERVER_ERROR
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
-		}
-	}
-
-	private List<User> getUsers() {
-		if (security.isUserInRole("registered")
-				|| security.isUserInRole("admin")) {
-			Connection connection = null;
-			try {
-				connection = DataSourceSAP.getInstance().getDataSource()
-						.getConnection();
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.SERVICE_UNAVAILABLE)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.SERVICE_UNAVAILABLE
-										.getStatusCode(),
-								"Service unavailable.", request)).build());
-			}
-			try {
-				Statement stmt = connection.createStatement();
-				ResultSet rs = stmt.executeQuery("select * from user;");
-				List<User> users = new ArrayList<>();
-				while (rs.next()) {
-					User user = new User();
-					user.setUserid(rs.getInt("id"));
-					user.setName(rs.getString("name"));
-					user.setUsername(rs.getString("username"));
-					user.setPassword(rs.getString("password"));
-					user.setEmail(rs.getString("email"));
-					users.add(user);
-				}
-				if(users.size() == 0){
-					throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"User not found.", request)).build());
-				}
-				stmt.close();
-				connection.close();
-				return users;
-			} catch (SQLException e) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.INTERNAL_SERVER_ERROR
-										.getStatusCode(),
-								"Error accessing to database.", request))
-						.build());
-			}
-		} else {
-			throw new WebApplicationException(Response
-					.status(Response.Status.FORBIDDEN)
-					.entity(APIErrorBuilder.buildError(
-							Response.Status.FORBIDDEN.getStatusCode(),
-							"FORBIDDEN", request)).build());
 		}
 	}
 }
