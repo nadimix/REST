@@ -108,8 +108,7 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-
-
+<!--  ArtistResource -->
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>ArtistResource</web-resource-name>
@@ -121,6 +120,8 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
+	
+	
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>ArtistListResource</web-resource-name>

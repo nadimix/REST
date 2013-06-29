@@ -23,6 +23,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.base.CharMatcher;
+
 import dsa.colourmylife.rest.model.Artist;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
 import dsa.colourmylife.rest.util.DataSourceSAP;
@@ -115,6 +117,23 @@ public class ArtistListResource {
 								Response.Status.CONFLICT.getStatusCode(),
 								"Genre1 don't exist", request)).build());
 			}
+			if (isAscii(artist.getName()) != true ) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.BAD_REQUEST.getStatusCode(),
+								"Artistname only allow ASCII characters", request))
+						.build());
+			}
+			if (isAscii(artist.getInfo()) != true ) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.BAD_REQUEST.getStatusCode(),
+								"Info only allow ASCII characters", request))
+						.build());
+			}
+
 			connection.setAutoCommit(false);
 			try {
 				Statement stmt = connection.createStatement();
@@ -130,7 +149,7 @@ public class ArtistListResource {
 				}
 				sb.append("'" + artist.getInfo() + "');");
 				System.out.println(sb);
-				
+
 				int rs = stmt.executeUpdate(sb.toString());
 				if (rs == 0)
 					throw new WebApplicationException(Response
@@ -411,8 +430,12 @@ public class ArtistListResource {
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
 			if (!rs.next()) {
+				stmt.close();
+				connection.close();
 				return false;
 			}
+			stmt.close();
+			connection.close();
 			return true;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
@@ -422,5 +445,9 @@ public class ArtistListResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
+	}
+
+	public boolean isAscii(String someString) {
+		return CharMatcher.ASCII.matchesAllOf(someString);
 	}
 }

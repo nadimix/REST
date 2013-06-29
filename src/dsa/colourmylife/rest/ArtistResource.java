@@ -22,6 +22,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import com.google.common.base.CharMatcher;
+
 import dsa.colourmylife.rest.model.Artist;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
 import dsa.colourmylife.rest.util.DataSourceSAP;
@@ -46,14 +48,15 @@ public class ArtistResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Artist getArtistJSON(@PathParam("artist") String name, @QueryParam("user") String username) {
-		return getArtist(name, username);
+	public Artist getArtistJSON(@PathParam("artist") String artistname,
+			@QueryParam("user") String username) {		
+		return getArtist(artistname, username);
 	}
 
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteArtistJSON(@PathParam("artist") String name) {
-		deleteArtist(name);
+	public Response deleteArtistJSON(@PathParam("artist") String artistname) {		
+		deleteArtist(artistname);
 		return Response.status(204).build();
 	}
 
@@ -74,7 +77,7 @@ public class ArtistResource {
 		return response;
 	}
 
-	private Artist getArtist(String name, String username) {
+	private Artist getArtist(String artistname, String username) {
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -91,9 +94,10 @@ public class ArtistResource {
 		try {
 			Statement stmt = connection.createStatement();
 			// SELECT * FROM artist WHERE name='Florence';
-			ResultSet rs = stmt
-					.executeQuery("SELECT * FROM artist WHERE name = '" + name
-							+ "';");
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM artist WHERE name = '" + artistname + "';");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
 			if (!rs.next()) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
@@ -107,7 +111,7 @@ public class ArtistResource {
 			artist.setGenreId(rs.getInt("idgenre1"));
 			artist.setGenre2Id(rs.getInt("idgenre2"));
 			artist.setInfo(rs.getString("info"));
-			if(username!=null){
+			if (username != null) {
 				int iduser = obtainIdUser(username);
 				boolean foll = isFollowed(artist.getArtistId(), iduser);
 				artist.setFollowed(foll);
@@ -131,7 +135,7 @@ public class ArtistResource {
 		}
 	}
 
-	private void deleteArtist(String name) {
+	private void deleteArtist(String artistname) {
 		if (!security.isUserInRole("admin")) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.FORBIDDEN)
@@ -151,18 +155,26 @@ public class ArtistResource {
 											.getStatusCode(),
 									"Service unavailable.", request)).build());
 		}
-		// TODO check user exist
+		if (artistExist(artistname) != true) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.CONFLICT)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.CONFLICT.getStatusCode(),
+							"Artist not found", request)).build());
+		}
 		try {
 			Statement stmt = connection.createStatement();
 			// DELETE FROM artist WHERE name ='Florence';
-			int rs = stmt.executeUpdate("DELETE FROM artist WHERE name ='"
-					+ name + "';");
+			StringBuilder sb = new StringBuilder(
+					"DELETE FROM artist WHERE name ='" + artistname + "';");
+			System.out.println(sb);
+			int rs = stmt.executeUpdate(sb.toString());
 			if (rs == 0)
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
+								"Failed", request)).build());
 			stmt.close();
 			connection.close();
 		} catch (SQLException e) {
@@ -175,7 +187,7 @@ public class ArtistResource {
 		}
 	}
 
-	private void updateArtist(String name, Artist artist) {
+	private void updateArtist(String artistname, Artist artist) {
 		if (!security.isUserInRole("admin")) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.FORBIDDEN)
@@ -198,21 +210,42 @@ public class ArtistResource {
 		}
 		try {
 			Statement stmt = connection.createStatement();
-			// Only allow to change Information
 			// UPDATE artist SET info='Formados por una vocalista besada por el
 			// fuego' WHERE name='Florence';
+			if (artistExist(artistname) == false) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.CONFLICT)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.CONFLICT.getStatusCode(),
+								"Artist not found", request)).build());
+			}
+			if (artist.getInfo() == null) {
+				throw new WebApplicationException(
+						Response.status(Response.Status.BAD_REQUEST)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.BAD_REQUEST
+												.getStatusCode(),
+										"ArtistName, GenreId and Info camps mustn't be empty",
+										request)).build());
+			}
+			if (isAscii(artist.getInfo()) == false) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.BAD_REQUEST.getStatusCode(),
+								"Only ASCII characters are allowed", request))
+						.build());
+			}
 			StringBuilder sb = new StringBuilder("UPDATE artist SET info='"
-					+ artist.getInfo() + "' WHERE name='" + name + "';");
+					+ artist.getInfo() + "' WHERE name='" + artistname + "';");
 			System.out.println(sb);
-
 			int rs = stmt.executeUpdate(sb.toString());
-
 			if (rs == 0) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
+								"Failed", request)).build());
 			}
 
 			stmt.close();
@@ -267,7 +300,7 @@ public class ArtistResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
-	
+
 	public int obtainIdUser(String username) {
 		Connection connection = null;
 		try {
@@ -310,7 +343,7 @@ public class ArtistResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
-	
+
 	public boolean isFollowed(int idartist, int iduser) {
 		Connection connection = null;
 		try {
@@ -349,5 +382,48 @@ public class ArtistResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
+	}
+
+	public boolean artistExist(String artistname) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM artist WHERE name='Florence';
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM artist WHERE name = '" + artistname + "';");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				stmt.close();
+				connection.close();
+				return false;
+			}
+			stmt.close();
+			connection.close();
+			return true;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	public boolean isAscii(String someString) {
+		 return CharMatcher.ASCII.matchesAllOf(someString);
 	}
 }
