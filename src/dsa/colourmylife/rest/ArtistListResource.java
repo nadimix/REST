@@ -117,15 +117,15 @@ public class ArtistListResource {
 								Response.Status.CONFLICT.getStatusCode(),
 								"Genre1 don't exist", request)).build());
 			}
-			if (isAscii(artist.getName()) != true ) {
+			if (isAscii(artist.getName()) != true) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.BAD_REQUEST)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.BAD_REQUEST.getStatusCode(),
-								"Artistname only allow ASCII characters", request))
-						.build());
+								"Artistname only allow ASCII characters",
+								request)).build());
 			}
-			if (isAscii(artist.getInfo()) != true ) {
+			if (isAscii(artist.getInfo()) != true) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.BAD_REQUEST)
 						.entity(APIErrorBuilder.buildError(
@@ -186,63 +186,73 @@ public class ArtistListResource {
 	}
 
 	private List<Artist> getArtistList(String username) {
-		Connection connection = null;
-		try {
-			connection = DataSourceSAP.getInstance().getDataSource()
-					.getConnection();
-		} catch (SQLException e) {
-			throw new WebApplicationException(
-					Response.status(Response.Status.SERVICE_UNAVAILABLE)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.SERVICE_UNAVAILABLE
-											.getStatusCode(),
-									"Service unavailable.", request)).build());
-		}
-		try {
-			Statement stmt = connection.createStatement();
-			StringBuilder sb = new StringBuilder("SELECT * FROM artist;");
-			System.out.println(sb);
-			ResultSet rs = stmt.executeQuery(sb.toString());
-			// SELECT name FROM genre WHERE id=(SELECT idgenre1 FROM artist
-			// WHERE id=1);
-			List<Artist> artistList = new ArrayList<>();
-			while (rs.next()) {
-				Artist artist = new Artist();
-				artist.setArtistid(rs.getInt("id"));
-				artist.setName(rs.getString("name"));
-				artist.setGenreId(rs.getInt("idgenre1"));
-				artist.setGenre2Id(rs.getInt("idgenre2"));
-				artist.setInfo(rs.getString("info"));
-				String genre1 = obtainGenre(artist.getGenreId());
-				artist.setGenre(genre1);
-				if (artist.getGenre2Id() != 0) {
-					String genre2 = obtainGenre(artist.getGenre2Id());
-					artist.setGenre2(genre2);
-				}
-				if (username != null) {
-					int iduser = obtainIdUser(username);
-					boolean foll = isFollowed(artist.getArtistId(), iduser);
-					artist.setFollowed(foll);
-				}
-				artistList.add(artist);
-				System.out.println("Artist: " + artist.getName());
-			}
-			if (artistList.size() == 0)
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
+						.status(Response.Status.SERVICE_UNAVAILABLE)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
-			stmt.close();
-			connection.close();
-			return artistList;
-		} catch (SQLException e) {
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+			try {
+				Statement stmt = connection.createStatement();
+				StringBuilder sb = new StringBuilder("SELECT * FROM artist;");
+				System.out.println(sb);
+				ResultSet rs = stmt.executeQuery(sb.toString());
+				// SELECT name FROM genre WHERE id=(SELECT idgenre1 FROM artist
+				// WHERE id=1);
+				List<Artist> artistList = new ArrayList<>();
+				while (rs.next()) {
+					Artist artist = new Artist();
+					artist.setArtistid(rs.getInt("id"));
+					artist.setName(rs.getString("name"));
+					artist.setGenreId(rs.getInt("idgenre1"));
+					artist.setGenre2Id(rs.getInt("idgenre2"));
+					artist.setInfo(rs.getString("info"));
+					String genre1 = obtainGenre(artist.getGenreId());
+					artist.setGenre(genre1);
+					if (artist.getGenre2Id() != 0) {
+						String genre2 = obtainGenre(artist.getGenre2Id());
+						artist.setGenre2(genre2);
+					}
+					if (username != null) {
+						int iduser = obtainIdUser(username);
+						boolean foll = isFollowed(artist.getArtistId(), iduser);
+						artist.setFollowed(foll);
+					}
+					artistList.add(artist);
+					System.out.println("Artist: " + artist.getName());
+				}
+				if (artistList.size() == 0)
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"Artist not found.", request)).build());
+				stmt.close();
+				connection.close();
+				return artistList;
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			}
+		} else {
 			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.status(Response.Status.FORBIDDEN)
 					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(),
-							"Error accessing to database.", request)).build());
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
 		}
 	}
 

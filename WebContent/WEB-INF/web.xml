@@ -102,10 +102,12 @@
 		<web-resource-collection>
 			<web-resource-name>ArtistListResource</web-resource-name>
 			<url-pattern>/api/artists</url-pattern>
+			<http-method>GET</http-method>
 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>admin</role-name>
+			<role-name>registered</role-name>
 		</auth-constraint>
 	</security-constraint>
 <!--  ArtistResource -->
@@ -113,43 +115,20 @@
 		<web-resource-collection>
 			<web-resource-name>ArtistResource</web-resource-name>
 			<url-pattern>/api/artists/*</url-pattern>
-			<http-method>PUT</http-method>
-			<http-method>DELETE</http-method>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>admin</role-name>
-		</auth-constraint>
-	</security-constraint>
-	
-	
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>ArtistListResource</web-resource-name>
-			<url-pattern>/api/artists</url-pattern>
-			<http-method>POST</http-method>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>admin</role-name>
-		</auth-constraint>
-	</security-constraint>
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>ArtistEventResource</web-resource-name>
-			<url-pattern>/api/artists/*/events/*</url-pattern>
 			<http-method>GET</http-method>
 			<http-method>PUT</http-method>
 			<http-method>DELETE</http-method>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>registered</role-name>
 			<role-name>admin</role-name>
+			<role-name>registered</role-name>
 		</auth-constraint>
 	</security-constraint>
+	<!-- ArtistEventListResource -->
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>ArtistEventListResource</web-resource-name>
-			<url-pattern>/api/artists/*/events</url-pattern>
-			<http-method>GET</http-method>
+			<url-pattern>/api/artists/*</url-pattern>
 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
@@ -157,6 +136,21 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
+	<!-- ArtistEventResource -->	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>ArtistEventResource</web-resource-name>
+			<url-pattern>/api/artists/*</url-pattern>
+			<http-method>GET</http-method>
+			<http-method>PUT</http-method>
+			<http-method>DELETE</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>registered</role-name>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+	
 
 	<login-config>
 		<auth-method>BASIC</auth-method>

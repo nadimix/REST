@@ -79,69 +79,80 @@ public class ArtistEventResource {
 	}
 
 	private Event getEvent(int eventid, String artistname, String username) {
-		Connection connection = null;
-		try {
-			connection = DataSourceSAP.getInstance().getDataSource()
-					.getConnection();
-		} catch (SQLException e) {
-			throw new WebApplicationException(
-					Response.status(Response.Status.SERVICE_UNAVAILABLE)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.SERVICE_UNAVAILABLE
-											.getStatusCode(),
-									"Service unavailable.", request)).build());
-		}
-
-		try {
-			Statement stmt = connection.createStatement();
-			// select * from event where id = 1 and artist = "Florence";
-			ResultSet rs = stmt.executeQuery("SELECT * FROM event WHERE id="
-					+ eventid + " and artist='" + artistname + "';");
-			if (!rs.next()) {
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
+						.status(Response.Status.SERVICE_UNAVAILABLE)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"NOT FOUND", request)).build());
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
 			}
 
-			Event event = new Event();
-			event.setEventId(rs.getInt("id"));
-			event.setKindId(rs.getInt("idkind"));
-			String kind2 = obtainKind(rs.getInt("idkind"));
-			event.setKind(kind2);
-			event.setArtist(rs.getString("artist"));
-			event.setDate(rs.getString("date"));
-			event.setPlace(rs.getString("place"));
-			event.setCity(rs.getString("city"));
-			event.setCountry(rs.getString("country"));
-			event.setInfo(rs.getString("info"));
-			event.setInsertdate(rs.getString("insertdate"));
-			if (username != null) {
-				int iduser = obtainIdUser(username);
-				boolean fav = isFav(event.getEventId(), iduser);
-				event.setFav(fav);
-			}
-			event.setLink(uri.getAbsolutePath().toString());
-			System.out.println("Link: " + event.getLink());
-			// @Path("/artists/{artist}/events/{eventid}")
-			event.setSameKindLink(uri.getBaseUri().toString() + "/artists/"
-					+ artistname + "/events?idkind=" + event.getKindId());
-			event.setSameCountryLink(uri.getBaseUri().toString() + "/artists/"
-					+ artistname + "/events?country=" + event.getCountry());
-			// TODO OPTIONAL: Convert kindid into a kind, Maybe another stmt
-			// event.setKind("kind");
-			stmt.close();
-			connection.close();
+			try {
+				Statement stmt = connection.createStatement();
+				// select * from event where id = 1 and artist = "Florence";
+				ResultSet rs = stmt
+						.executeQuery("SELECT * FROM event WHERE id=" + eventid
+								+ " and artist='" + artistname + "';");
+				if (!rs.next()) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"NOT FOUND", request)).build());
+				}
 
-			return event;
-		} catch (SQLException e) {
+				Event event = new Event();
+				event.setEventId(rs.getInt("id"));
+				event.setKindId(rs.getInt("idkind"));
+				String kind2 = obtainKind(rs.getInt("idkind"));
+				event.setKind(kind2);
+				event.setArtist(rs.getString("artist"));
+				event.setDate(rs.getString("date"));
+				event.setPlace(rs.getString("place"));
+				event.setCity(rs.getString("city"));
+				event.setCountry(rs.getString("country"));
+				event.setInfo(rs.getString("info"));
+				event.setInsertdate(rs.getString("insertdate"));
+				if (username != null) {
+					int iduser = obtainIdUser(username);
+					boolean fav = isFav(event.getEventId(), iduser);
+					event.setFav(fav);
+				}
+				event.setLink(uri.getAbsolutePath().toString());
+				System.out.println("Link: " + event.getLink());
+				// @Path("/artists/{artist}/events/{eventid}")
+				event.setSameKindLink(uri.getBaseUri().toString() + "/artists/"
+						+ artistname + "/events?idkind=" + event.getKindId());
+				event.setSameCountryLink(uri.getBaseUri().toString()
+						+ "/artists/" + artistname + "/events?country="
+						+ event.getCountry());
+				// TODO OPTIONAL: Convert kindid into a kind, Maybe another stmt
+				// event.setKind("kind");
+				stmt.close();
+				connection.close();
+				return event;
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			}
+		} else {
 			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.status(Response.Status.FORBIDDEN)
 					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(),
-							"Error accessing to database.", request)).build());
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
 		}
 	}
 

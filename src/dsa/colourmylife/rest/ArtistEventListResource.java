@@ -24,6 +24,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.base.CharMatcher;
+
 import dsa.colourmylife.rest.model.Event;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
 import dsa.colourmylife.rest.util.DataSourceSAP;
@@ -66,108 +68,127 @@ public class ArtistEventListResource {
 
 	private List<Event> getEventList(String artist, String city, String kind,
 			String username) {
-		Connection connection = null;
-		try {
-			connection = DataSourceSAP.getInstance().getDataSource()
-					.getConnection();
-		} catch (SQLException e) {
-			throw new WebApplicationException(
-					Response.status(Response.Status.SERVICE_UNAVAILABLE)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.SERVICE_UNAVAILABLE
-											.getStatusCode(),
-									"Service unavailable.", request)).build());
-		}
-
-		try {
-			Statement stmt = connection.createStatement();
-			StringBuilder sb = new StringBuilder();
-			if (artist == null) {
-				// SELECT * FROM event;
-				sb = new StringBuilder("SELECT * FROM event;");
-				System.out.println(sb);
-			}
-			if (city != null && kind == null) {
-				// SELECT * FROM event WHERE artist='Florence' AND
-				// city='Badalona';
-				sb = new StringBuilder("SELECT * FROM event WHERE artist='"
-						+ artist + "' AND city='" + city + "';");
-				System.out.println(sb);
-			}
-			if (city == null && kind != null) {
-				// SELECT * FROM event WHERE artist='Florence' AND idkind=1;
-				int kindId = obtainKindId(kind);
-				sb = new StringBuilder("SELECT * FROM event WHERE artist='"
-						+ artist + "' AND idkind='" + kindId + "';");
-				System.out.println(sb);
-			}
-			if (kind != null && city != null) {
-				// SELECT * FROM event WHERE artist='Florence' AND idkind=1 AND
-				// city='Badalona';
-				int kindId = obtainKindId(kind);
-				sb = new StringBuilder("SELECT * FROM event WHERE artist='"
-						+ artist + "' AND idkind='" + kindId + "' AND city='"
-						+ city + "';");
-				System.out.println(sb);
-			}
-			if (city == null && kind == null) {
-				// SELECT * FROM event WHERE artist='Florence';
-				sb = new StringBuilder("SELECT * FROM event WHERE artist='"
-						+ artist + "';");
-				System.out.println(sb);
-			}
-			System.out.println(sb);
-
-			ResultSet rs = stmt.executeQuery(sb.toString());
-			List<Event> artistEventList = new ArrayList<Event>();
-			while (rs.next()) {
-				Event event = new Event();
-				event.setEventId(rs.getInt("id"));
-				event.setKindId(rs.getInt("idkind"));
-				String kind2 = obtainKind(rs.getInt("idkind"));
-				event.setKind(kind2);
-				event.setArtist(rs.getString("artist"));
-				event.setDate(rs.getString("date"));
-				event.setPlace(rs.getString("place"));
-				event.setCity(rs.getString("city"));
-				event.setCountry(rs.getString("country"));
-				event.setInfo(rs.getString("info"));
-				event.setInsertdate(rs.getString("insertdate"));
-				if (username != null) {
-					int iduser = obtainIdUser(username);
-					boolean fav = isFav(event.getEventId(), iduser);
-					event.setFav(fav);
-				}
-				event.setLink(uri.getAbsolutePath().toString());
-				System.out.println("Link: " + event.getLink());
-				event.setSameKindLink(uri.getBaseUri().toString() + "artists/"
-						+ artist + "/events?kind=" + event.getKind());
-				event.setSameCountryLink(uri.getBaseUri().toString()
-						+ "artists/" + artist + "/events?country="
-						+ event.getCountry());
-				artistEventList.add(event);
-			}
-			if (artistEventList.size() == 0)
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
+						.status(Response.Status.SERVICE_UNAVAILABLE)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"No Event List found.", request)).build());
-			stmt.close();
-			connection.close();
-			return artistEventList;
-		} catch (SQLException e) {
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
+			}
+
+			try {
+				Statement stmt = connection.createStatement();
+				StringBuilder sb = new StringBuilder();
+				if (artist == null) {
+					// SELECT * FROM event;
+					sb = new StringBuilder("SELECT * FROM event;");
+					System.out.println(sb);
+				}
+				if (city != null && kind == null) {
+					// SELECT * FROM event WHERE artist='Florence' AND
+					// city='Badalona';
+					sb = new StringBuilder("SELECT * FROM event WHERE artist='"
+							+ artist + "' AND city='" + city + "';");
+					System.out.println(sb);
+				}
+				if (city == null && kind != null) {
+					// SELECT * FROM event WHERE artist='Florence' AND idkind=1;
+					int kindId = obtainKindId(kind);
+					sb = new StringBuilder("SELECT * FROM event WHERE artist='"
+							+ artist + "' AND idkind='" + kindId + "';");
+					System.out.println(sb);
+				}
+				if (kind != null && city != null) {
+					// SELECT * FROM event WHERE artist='Florence' AND idkind=1
+					// AND
+					// city='Badalona';
+					int kindId = obtainKindId(kind);
+					sb = new StringBuilder("SELECT * FROM event WHERE artist='"
+							+ artist + "' AND idkind='" + kindId
+							+ "' AND city='" + city + "';");
+					System.out.println(sb);
+				}
+				if (city == null && kind == null) {
+					// SELECT * FROM event WHERE artist='Florence';
+					sb = new StringBuilder("SELECT * FROM event WHERE artist='"
+							+ artist + "';");
+					System.out.println(sb);
+				}
+				System.out.println(sb);
+
+				ResultSet rs = stmt.executeQuery(sb.toString());
+				List<Event> artistEventList = new ArrayList<Event>();
+				while (rs.next()) {
+					Event event = new Event();
+					event.setEventId(rs.getInt("id"));
+					event.setKindId(rs.getInt("idkind"));
+					String kind2 = obtainKind(rs.getInt("idkind"));
+					event.setKind(kind2);
+					event.setArtist(rs.getString("artist"));
+					event.setDate(rs.getString("date"));
+					event.setPlace(rs.getString("place"));
+					event.setCity(rs.getString("city"));
+					event.setCountry(rs.getString("country"));
+					event.setInfo(rs.getString("info"));
+					event.setInsertdate(rs.getString("insertdate"));
+					if (username != null) {
+						int iduser = obtainIdUser(username);
+						boolean fav = isFav(event.getEventId(), iduser);
+						event.setFav(fav);
+					}
+					event.setLink(uri.getAbsolutePath().toString());
+					System.out.println("Link: " + event.getLink());
+					event.setSameKindLink(uri.getBaseUri().toString()
+							+ "artists/" + artist + "/events?kind="
+							+ event.getKind());
+					event.setSameCountryLink(uri.getBaseUri().toString()
+							+ "artists/" + artist + "/events?country="
+							+ event.getCountry());
+					artistEventList.add(event);
+				}
+				if (artistEventList.size() == 0)
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"No Event List found.", request)).build());
+				stmt.close();
+				connection.close();
+				return artistEventList;
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
+			}
+		} else {
 			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.status(Response.Status.FORBIDDEN)
 					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(),
-							"Error accessing to database.", request)).build());
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
 		}
 	}
 
 	private int insertEvent(Event event, String artist) {
-		int id = 0;
+		if (!security.isUserInRole("admin")) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
+		}
+		int eventid = 0;
 		Connection connection = null;
 		try {
 			connection = DataSourceSAP.getInstance().getDataSource()
@@ -182,12 +203,12 @@ public class ArtistEventListResource {
 		}
 		try {
 			Statement stmt = connection.createStatement();
-			if (artist == null) {
+			if (artistExist(artist) == false) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.CONFLICT)
+						.status(Response.Status.NOT_FOUND)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.CONFLICT.getStatusCode(),
-								"Artist doesn't exists", request)).build());
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
 			}
 			if (event.getKindId() == 0 || event.getCountry() == null) {
 				throw new WebApplicationException(Response
@@ -197,16 +218,21 @@ public class ArtistEventListResource {
 								"KindId or Country fields mustn't been empty",
 								request)).build());
 			}
-			idKindExists(event.getKindId());
-			String insert = buildInsert(event, artist);
-			id = event.getEventId();
-			int rs = stmt.executeUpdate(insert);
-			if (rs == 0)
+			if (idKindExists(event.getKindId()) == false) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.NOT_FOUND)
 						.entity(APIErrorBuilder.buildError(
 								Response.Status.NOT_FOUND.getStatusCode(),
-								"Event not found.", request)).build());
+								"Kind not found.", request)).build());
+			}
+
+			String insert = buildInsert(event, artist);
+			stmt.executeUpdate(insert, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = stmt.getGeneratedKeys();
+			if (rs.next()) {
+				eventid = rs.getInt(1);
+			}
+			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
@@ -222,7 +248,7 @@ public class ArtistEventListResource {
 
 			}
 		}
-		return id;
+		return eventid;
 	}
 
 	public String buildInsert(Event event, String artist) {
@@ -252,6 +278,14 @@ public class ArtistEventListResource {
 			sb.append("NULL, ");
 		sb.append("'" + event.getCountry() + "', ");
 		if (event.getInfo() != null) {
+			if (isAscii(event.getInfo()) != true) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.BAD_REQUEST.getStatusCode(),
+								"Only ASCII characters are allowed", request))
+						.build());
+			}
 			sb.append("'" + event.getInfo() + "', ");
 		} else
 			sb.append("NULL, ");
@@ -391,11 +425,7 @@ public class ArtistEventListResource {
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
 			if (!rs.next()) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Kind not found.", request)).build());
+				return false;
 			}
 			stmt.close();
 			connection.close();
@@ -483,6 +513,49 @@ public class ArtistEventListResource {
 				connection.close();
 				return true;
 			}
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	public boolean isAscii(String someString) {
+		return CharMatcher.ASCII.matchesAllOf(someString);
+	}
+
+	public boolean artistExist(String artistname) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM artist WHERE name='Florence';
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM artist WHERE name = '" + artistname + "';");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				stmt.close();
+				connection.close();
+				return false;
+			}
+			stmt.close();
+			connection.close();
+			return true;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
