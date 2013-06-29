@@ -69,7 +69,6 @@ public class ArtistListResource {
 	}
 
 	private void insertArtist(Artist artist) {
-		// System.out.println(security.getUserPrincipal().getName());
 		if (!security.isUserInRole("admin")) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.FORBIDDEN)
@@ -102,7 +101,6 @@ public class ArtistListResource {
 										request)).build());
 
 			}
-
 			if (getArtist(artist.getName()) != null) {
 				throw new WebApplicationException(Response
 						.status(Response.Status.CONFLICT)
@@ -110,26 +108,37 @@ public class ArtistListResource {
 								Response.Status.CONFLICT.getStatusCode(),
 								"Artist already exists", request)).build());
 			}
-
+			if (genreExist(artist.getGenreId()) == false) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.CONFLICT)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.CONFLICT.getStatusCode(),
+								"Genre1 don't exist", request)).build());
+			}
 			connection.setAutoCommit(false);
-			// Insertamos artista en la BD
 			try {
 				Statement stmt = connection.createStatement();
 				// INSERT INTO artist VALUES (NULL, "Florence", 4, NULL,
 				// "Grupo imprescindible");
 				StringBuilder sb = new StringBuilder(
 						"INSERT INTO artist VALUES (NULL, '" + artist.getName()
-								+ "', " + artist.getGenreId() + ", "
-								+ artist.getGenre2Id() + ", '"
-								+ artist.getInfo() + "');");
+								+ "', " + artist.getGenreId() + ", ");
+				if (genreExist(artist.getGenre2Id()) == true) {
+					sb.append("" + artist.getGenre2Id() + ", ");
+				} else {
+					sb.append("0, ");
+				}
+				sb.append("'" + artist.getInfo() + "');");
 				System.out.println(sb);
+				
 				int rs = stmt.executeUpdate(sb.toString());
 				if (rs == 0)
 					throw new WebApplicationException(Response
 							.status(Response.Status.NOT_FOUND)
 							.entity(APIErrorBuilder.buildError(
 									Response.Status.NOT_FOUND.getStatusCode(),
-									"Artist not found.", request)).build());
+									"Artist can't been inserted.", request))
+							.build());
 				stmt.close();
 			} catch (SQLException e) {
 				throw new WebApplicationException(Response
@@ -191,13 +200,13 @@ public class ArtistListResource {
 					String genre2 = obtainGenre(artist.getGenre2Id());
 					artist.setGenre2(genre2);
 				}
-				if(username!=null){
+				if (username != null) {
 					int iduser = obtainIdUser(username);
 					boolean foll = isFollowed(artist.getArtistId(), iduser);
 					artist.setFollowed(foll);
 				}
 				artistList.add(artist);
-				System.out.println("Artist: "+artist.getName());
+				System.out.println("Artist: " + artist.getName());
 			}
 			if (artistList.size() == 0)
 				throw new WebApplicationException(Response
@@ -295,8 +304,8 @@ public class ArtistListResource {
 									.getStatusCode(),
 							"Error accessing to database.", request)).build());
 		}
-
 	}
+
 	public int obtainIdUser(String username) {
 		Connection connection = null;
 		try {
@@ -339,7 +348,7 @@ public class ArtistListResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
-	
+
 	public boolean isFollowed(int idartist, int iduser) {
 		Connection connection = null;
 		try {
@@ -370,6 +379,41 @@ public class ArtistListResource {
 				connection.close();
 				return true;
 			}
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	public boolean genreExist(int genreid) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT name FROM genre WHERE id=1;
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM genre WHERE id=" + genreid + ";");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				return false;
+			}
+			return true;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)

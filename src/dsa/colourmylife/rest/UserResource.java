@@ -40,9 +40,16 @@ public class UserResource {
 			@QueryParam("option") int option) {
 		if (option == 1) {
 			return getUser(username);
-		} else {
-
+		} 
+		if (password != null){			
 			return login(username, password);
+		}
+		else {
+			throw new WebApplicationException(Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN you must enter option or password", request)).build());
 		}
 	}
 
