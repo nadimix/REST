@@ -109,13 +109,6 @@ public class UserEventListResource {
 								+ "artists/" + event.getArtist()
 								+ "/events?country=" + event.getCountry());
 						artistEventList.add(event);
-					}
-					if (artistEventList.size() == 0) {
-				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Event not found.", request)).build());
 			}
 					stmt.close();
 				}
