@@ -243,6 +243,12 @@ DELETE FROM assist WHERE idevent=1 and iduser=1;
 
 SELECT artist.id, artist.name, artist.idgenre1, artist.idgenre2, artist.info FROM artist INNER JOIN follow on follow.idartist=artist.id and follow.iduser=1 order by name;
 
+SELECT event.id, event.artist, artist.name FROM event INNER JOIN artist ON artist.name=event.artist WHERE artist.name=(SELECT name FROM artist WHERE id=1);
+
+SELECT e.id, a.idevent, e.artist, a.iduser FROM event e INNER JOIN assist a  INNER JOIN follow f ON e.id=a.idevent AND a.iduser=f.iduser WHERE f.iduser=1 AND e.artist=(SELECT name FROM artist a INNER JOIN follow f ON a.id = f.idartist WHERE f.iduser=1);
+
+SELECT e.id, a.idevent, e.artist, a.iduser FROM event e INNER JOIN assist a  INNER JOIN follow f ON e.id=a.idevent AND a.iduser=f.iduser WHERE f.iduser=1 AND e.artist=(SELECT name FROM artist a WHERE a.id=5);
+
 */
 
 

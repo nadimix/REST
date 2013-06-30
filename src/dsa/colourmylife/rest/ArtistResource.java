@@ -49,13 +49,13 @@ public class ArtistResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Artist getArtistJSON(@PathParam("artist") String artistname,
-			@QueryParam("user") String username) {		
+			@QueryParam("user") String username) {
 		return getArtist(artistname, username);
 	}
 
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteArtistJSON(@PathParam("artist") String artistname) {		
+	public Response deleteArtistJSON(@PathParam("artist") String artistname) {
 		deleteArtist(artistname);
 		return Response.status(204).build();
 	}
@@ -78,60 +78,71 @@ public class ArtistResource {
 	}
 
 	private Artist getArtist(String artistname, String username) {
-		Connection connection = null;
-		try {
-			connection = DataSourceSAP.getInstance().getDataSource()
-					.getConnection();
-		} catch (SQLException e) {
-			throw new WebApplicationException(
-					Response.status(Response.Status.SERVICE_UNAVAILABLE)
-							.entity(APIErrorBuilder.buildError(
-									Response.Status.SERVICE_UNAVAILABLE
-											.getStatusCode(),
-									"Service unavailable.", request)).build());
-		}
-
-		try {
-			Statement stmt = connection.createStatement();
-			// SELECT * FROM artist WHERE name='Florence';
-			StringBuilder sb = new StringBuilder(
-					"SELECT * FROM artist WHERE name = '" + artistname + "';");
-			System.out.println(sb);
-			ResultSet rs = stmt.executeQuery(sb.toString());
-			if (!rs.next()) {
+		if (security.isUserInRole("registered")
+				|| security.isUserInRole("admin")) {
+			Connection connection = null;
+			try {
+				connection = DataSourceSAP.getInstance().getDataSource()
+						.getConnection();
+			} catch (SQLException e) {
 				throw new WebApplicationException(Response
-						.status(Response.Status.NOT_FOUND)
+						.status(Response.Status.SERVICE_UNAVAILABLE)
 						.entity(APIErrorBuilder.buildError(
-								Response.Status.NOT_FOUND.getStatusCode(),
-								"Artist not found.", request)).build());
+								Response.Status.SERVICE_UNAVAILABLE
+										.getStatusCode(),
+								"Service unavailable.", request)).build());
 			}
-			Artist artist = new Artist();
-			artist.setArtistid(rs.getInt("id"));
-			artist.setName(rs.getString("name"));
-			artist.setGenreId(rs.getInt("idgenre1"));
-			artist.setGenre2Id(rs.getInt("idgenre2"));
-			artist.setInfo(rs.getString("info"));
-			if (username != null) {
-				int iduser = obtainIdUser(username);
-				boolean foll = isFollowed(artist.getArtistId(), iduser);
-				artist.setFollowed(foll);
+
+			try {
+				Statement stmt = connection.createStatement();
+				// SELECT * FROM artist WHERE name='Florence';
+				StringBuilder sb = new StringBuilder(
+						"SELECT * FROM artist WHERE name = '" + artistname
+								+ "';");
+				System.out.println(sb);
+				ResultSet rs = stmt.executeQuery(sb.toString());
+				if (!rs.next()) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.NOT_FOUND.getStatusCode(),
+									"Artist not found.", request)).build());
+				}
+				Artist artist = new Artist();
+				artist.setArtistid(rs.getInt("id"));
+				artist.setName(rs.getString("name"));
+				artist.setGenreId(rs.getInt("idgenre1"));
+				artist.setGenre2Id(rs.getInt("idgenre2"));
+				artist.setInfo(rs.getString("info"));
+				if (username != null) {
+					int iduser = obtainIdUser(username);
+					boolean foll = isFollowed(artist.getArtistId(), iduser);
+					artist.setFollowed(foll);
+				}
+				stmt.close();
+				connection.close();
+				String genre1 = obtainGenre(artist.getGenreId());
+				artist.setGenre(genre1);
+				if (artist.getGenre2Id() != 0) {
+					String genre2 = obtainGenre(artist.getGenre2Id());
+					artist.setGenre2(genre2);
+				}
+				return artist;
+			} catch (SQLException e) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.INTERNAL_SERVER_ERROR
+										.getStatusCode(),
+								"Error accessing to database.", request))
+						.build());
 			}
-			stmt.close();
-			connection.close();
-			String genre1 = obtainGenre(artist.getGenreId());
-			artist.setGenre(genre1);
-			if (artist.getGenre2Id() != 0) {
-				String genre2 = obtainGenre(artist.getGenre2Id());
-				artist.setGenre2(genre2);
-			}
-			return artist;
-		} catch (SQLException e) {
+		} else {
 			throw new WebApplicationException(Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.status(Response.Status.FORBIDDEN)
 					.entity(APIErrorBuilder.buildError(
-							Response.Status.INTERNAL_SERVER_ERROR
-									.getStatusCode(),
-							"Error accessing to database.", request)).build());
+							Response.Status.FORBIDDEN.getStatusCode(),
+							"FORBIDDEN", request)).build());
 		}
 	}
 
@@ -424,6 +435,6 @@ public class ArtistResource {
 	}
 
 	public boolean isAscii(String someString) {
-		 return CharMatcher.ASCII.matchesAllOf(someString);
+		return CharMatcher.ASCII.matchesAllOf(someString);
 	}
 }

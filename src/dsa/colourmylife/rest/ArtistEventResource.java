@@ -23,6 +23,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.base.CharMatcher;
+
 import dsa.colourmylife.rest.model.Event;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
 import dsa.colourmylife.rest.util.DataSourceSAP;
@@ -107,7 +109,6 @@ public class ArtistEventResource {
 									Response.Status.NOT_FOUND.getStatusCode(),
 									"NOT FOUND", request)).build());
 				}
-
 				Event event = new Event();
 				event.setEventId(rs.getInt("id"));
 				event.setKindId(rs.getInt("idkind"));
@@ -133,8 +134,6 @@ public class ArtistEventResource {
 				event.setSameCountryLink(uri.getBaseUri().toString()
 						+ "/artists/" + artistname + "/events?country="
 						+ event.getCountry());
-				// TODO OPTIONAL: Convert kindid into a kind, Maybe another stmt
-				// event.setKind("kind");
 				stmt.close();
 				connection.close();
 				return event;
@@ -156,7 +155,7 @@ public class ArtistEventResource {
 		}
 	}
 
-	private void updateEvent(int eventid, Event event, String name) {
+	private void updateEvent(int eventid, Event event, String artistname) {
 		if (!security.isUserInRole("admin")) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.FORBIDDEN)
@@ -189,7 +188,14 @@ public class ArtistEventResource {
 			// UPDATE event SET date='2014-09-20 22:00:00', place='Palau
 			// Joventut', city='Badalona', country='Catalunya', info='new
 			// Location' WHERE artist='Florence' AND id=1;
-			// TODO verificar campos NOT NULLs!!!!!
+
+			if (artistExist(artistname) == false) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.CONFLICT)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.CONFLICT.getStatusCode(),
+								"Artist not found", request)).build());
+			}
 
 			StringBuilder sb = new StringBuilder("UPDATE event SET ");
 			if (event.getDate() != null) {
@@ -202,10 +208,20 @@ public class ArtistEventResource {
 				sb.append("city='" + event.getCity() + "', ");
 			}
 			if (event.getInfo() != null) {
+				if (isAscii(event.getInfo()) == false) {
+					throw new WebApplicationException(
+							Response.status(Response.Status.BAD_REQUEST)
+									.entity(APIErrorBuilder.buildError(
+											Response.Status.BAD_REQUEST
+													.getStatusCode(),
+											"Only ASCII characters are allowed",
+											request)).build());
+				}
 				sb.append("info='" + event.getInfo() + "', ");
 			}
 			sb.append("country='" + event.getCountry() + "'");
-			sb.append(" WHERE artist='" + name + "' AND id=" + eventid + ";");
+			sb.append(" WHERE artist='" + artistname + "' AND id=" + eventid
+					+ ";");
 			System.out.println(sb);
 
 			int rs = stmt.executeUpdate(sb.toString());
@@ -395,4 +411,48 @@ public class ArtistEventResource {
 							"Error accessing to database.", request)).build());
 		}
 	}
+
+	public boolean isAscii(String someString) {
+		return CharMatcher.ASCII.matchesAllOf(someString);
+	}
+
+	public boolean artistExist(String artistname) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT * FROM artist WHERE name='Florence';
+			StringBuilder sb = new StringBuilder(
+					"SELECT * FROM artist WHERE name = '" + artistname + "';");
+			System.out.println(sb);
+			ResultSet rs = stmt.executeQuery(sb.toString());
+			if (!rs.next()) {
+				stmt.close();
+				connection.close();
+				return false;
+			}
+			stmt.close();
+			connection.close();
+			return true;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+	
 }

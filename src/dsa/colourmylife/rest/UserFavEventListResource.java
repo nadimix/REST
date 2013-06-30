@@ -55,9 +55,6 @@ public class UserFavEventListResource {
 		assistEvent(username, idevent);
 		Response response = null;
 		try {
-
-			// PREGUNTAR QUE LOCATION TENEMOS QUE PONER DEL RESPONSE STATUS!!
-
 			response = Response.status(204)
 					.location(new URI("/users/" + username + "/events/fav"))
 					.build();

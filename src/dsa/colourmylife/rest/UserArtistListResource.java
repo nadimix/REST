@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import dsa.colourmylife.rest.model.Artist;
+import dsa.colourmylife.rest.model.Event;
 import dsa.colourmylife.rest.util.APIErrorBuilder;
 import dsa.colourmylife.rest.util.DataSourceSAP;
 
@@ -137,14 +138,13 @@ public class UserArtistListResource {
 			try {
 				int iduser = obtainIdUser(username);
 				boolean exist = artistExist(idartist);
-				if(exist == false){
-					throw new WebApplicationException(
-							Response.status(Response.Status.CONFLICT)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.CONFLICT
-													.getStatusCode(),
-											"This artist doesn't exist",
-											request)).build());
+				if (exist == false) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.CONFLICT)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.CONFLICT.getStatusCode(),
+									"This artist doesn't exist", request))
+							.build());
 				}
 				boolean foll = isFollowed(idartist, iduser);
 				if (foll == true) {
@@ -214,14 +214,13 @@ public class UserArtistListResource {
 			try {
 				int iduser = obtainIdUser(username);
 				boolean exist = artistExist(idartist);
-				if(exist == false){
-					throw new WebApplicationException(
-							Response.status(Response.Status.CONFLICT)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.CONFLICT
-													.getStatusCode(),
-											"This artist doesn't exist",
-											request)).build());
+				if (exist == false) {
+					throw new WebApplicationException(Response
+							.status(Response.Status.CONFLICT)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.CONFLICT.getStatusCode(),
+									"This artist doesn't exist", request))
+							.build());
 				}
 				boolean foll = isFollowed(idartist, iduser);
 				if (foll == false) {
@@ -233,19 +232,71 @@ public class UserArtistListResource {
 									request)).build());
 				}
 				Statement stmt = connection.createStatement();
-				StringBuilder sb = new StringBuilder(
-						"DELETE from follow where idartist=" + idartist
-								+ " and iduser =" + iduser + ";");
-				System.out.println(sb.toString());
-				int rc = stmt.executeUpdate(sb.toString());
-				if (rc == 0) {
-					throw new WebApplicationException(
-							Response.status(Response.Status.NOT_FOUND)
+				if (hasEvents(iduser, idartist) == true) {
+					List<Event> idEventAssist = getEventAssistList(iduser,
+							idartist);
+					StringBuilder sb = new StringBuilder(
+							"DELETE from follow where idartist=" + idartist
+									+ " and iduser =" + iduser + ";");
+					System.out.println(sb.toString());
+					int rc = stmt.executeUpdate(sb.toString());
+					if (rc == 0) {
+						throw new WebApplicationException(Response
+								.status(Response.Status.NOT_FOUND)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.NOT_FOUND
+												.getStatusCode(),
+										"Failled to unfollow this artist",
+										request)).build());
+					}
+					for (Event E : idEventAssist) {
+						StringBuilder sb2 = new StringBuilder(
+								"DELETE FROM assist WHERE idevent="
+										+ E.getEventId() + " ");
+						sb2.append("AND iduser=" + iduser + ";");
+						System.out.println("DELETE assist: " + sb2);
+						int rc2 = stmt.executeUpdate(sb2.toString());
+						if (rc2 == 0) {
+							StringBuilder sb3 = new StringBuilder(
+									"INSERT INTO follow VALUES (NULL, "
+											+ iduser + ", " + idartist + ");");
+							System.out.println(sb3.toString());
+							int rc3 = stmt.executeUpdate(sb3.toString());
+							if (rc3 == 0) {
+								throw new WebApplicationException(Response
+										.status(Response.Status.NOT_FOUND)
+										.entity(APIErrorBuilder.buildError(
+												Response.Status.NOT_FOUND
+														.getStatusCode(),
+												"Failled to follow artist previously unfollowed "
+														+ E.getEventId(),
+												request)).build());
+							}
+							throw new WebApplicationException(Response
+									.status(Response.Status.NOT_FOUND)
 									.entity(APIErrorBuilder.buildError(
 											Response.Status.NOT_FOUND
 													.getStatusCode(),
-											"Failled to unfollow this artist",
-											request)).build());
+											"Failled to unmark event "
+													+ E.getEventId(), request))
+									.build());
+						}
+					}
+				} else {
+					StringBuilder sb = new StringBuilder(
+							"DELETE from follow where idartist=" + idartist
+									+ " and iduser =" + iduser + ";");
+					System.out.println(sb.toString());
+					int rc = stmt.executeUpdate(sb.toString());
+					if (rc == 0) {
+						throw new WebApplicationException(Response
+								.status(Response.Status.NOT_FOUND)
+								.entity(APIErrorBuilder.buildError(
+										Response.Status.NOT_FOUND
+												.getStatusCode(),
+										"Failled to unfollow this artist",
+										request)).build());
+					}
 				}
 				stmt.close();
 				connection.close();
@@ -406,6 +457,7 @@ public class UserArtistListResource {
 			// SELECT artist.id, artist.name, artist.idgenre1, artist.idgenre2,
 			// artist.info FROM artist INNER JOIN follow on
 			// follow.idartist=artist.id and follow.iduser=1 order by name;
+
 			StringBuilder sb = new StringBuilder(
 					"SELECT artist.id, artist.name, artist.idgenre1, artist.idgenre2, ");
 			sb.append("artist.info FROM artist INNER JOIN follow on ");
@@ -413,8 +465,8 @@ public class UserArtistListResource {
 			sb.append("follow.iduser=" + iduser + " order by name;");
 			System.out.println(sb);
 			ResultSet rs = stmt.executeQuery(sb.toString());
-			List<Artist> artistList = new ArrayList<>();			
-			int i =0;
+			List<Artist> artistList = new ArrayList<>();
+			int i = 0;
 			while (rs.next()) {
 				Artist artist = new Artist();
 				artist.setArtistid(rs.getInt("id"));
@@ -434,13 +486,13 @@ public class UserArtistListResource {
 				artistList.add(artist);
 				i++;
 			}
-			if (i==0) {
-							throw new WebApplicationException(Response
-									.status(Response.Status.NOT_FOUND)
-									.entity(APIErrorBuilder.buildError(
-											Response.Status.NOT_FOUND.getStatusCode(),
-											"Artist not found.", request)).build());
-						}
+			if (i == 0) {
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"Artist not found.", request)).build());
+			}
 			stmt.close();
 			connection.close();
 			return artistList;
@@ -485,6 +537,102 @@ public class UserArtistListResource {
 			stmt.close();
 			connection.close();
 			return genre;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+
+	}
+
+	public boolean hasEvents(int iduser, int idartist) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+		try {
+			Statement stmt = connection.createStatement();
+			StringBuilder sb2 = new StringBuilder(
+					"SELECT a.idevent FROM assist a INNER JOIN event e ");
+			sb2.append("INNER JOIN follow f ON e.id=a.idevent ");
+			sb2.append("AND a.iduser=f.iduser WHERE f.iduser=");
+			sb2.append(iduser + " AND e.artist=(SELECT name FROM artist a ");
+			sb2.append("WHERE a.id=" + idartist + ");");
+			System.out.println("HasEvents?: " + sb2);
+			ResultSet rs = stmt.executeQuery(sb2.toString());
+			if (!rs.next()) {
+				return false;
+			}
+			return true;
+		} catch (SQLException e) {
+			throw new WebApplicationException(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(APIErrorBuilder.buildError(
+							Response.Status.INTERNAL_SERVER_ERROR
+									.getStatusCode(),
+							"Error accessing to database.", request)).build());
+		}
+	}
+
+	public List<Event> getEventAssistList(int iduser, int idartist) {
+		Connection connection = null;
+		try {
+			connection = DataSourceSAP.getInstance().getDataSource()
+					.getConnection();
+		} catch (SQLException e) {
+			throw new WebApplicationException(
+					Response.status(Response.Status.SERVICE_UNAVAILABLE)
+							.entity(APIErrorBuilder.buildError(
+									Response.Status.SERVICE_UNAVAILABLE
+											.getStatusCode(),
+									"Service unavailable.", request)).build());
+		}
+
+		try {
+			Statement stmt = connection.createStatement();
+			// SELECT e.id FROM event e INNER JOIN assist a ON e.id=a.idevent
+			// AND e.artist=(SELECT name FROM artist a WHERE a.id=5) AND
+			// a.iduser=1;
+			StringBuilder sb2 = new StringBuilder(
+					"SELECT e.id FROM event e INNER JOIN assist a ON e.id=a.idevent ");
+			sb2.append("AND e.artist=(SELECT name FROM artist a WHERE a.id=");
+			sb2.append(idartist + ") AND a.iduser=" + iduser + ";");
+			// StringBuilder sb2 = new StringBuilder(
+			// "SELECT a.idevent FROM assist a INNER JOIN event e ");
+			// sb2.append("INNER JOIN follow f ON e.id=a.idevent ");
+			// sb2.append("AND a.iduser=f.iduser WHERE f.iduser=");
+			// sb2.append(iduser + " AND e.artist=(SELECT name FROM artist a ");
+			// sb2.append("WHERE a.id=" + idartist + ");");			
+			System.out.println("id Event assist: " + sb2);
+			ResultSet rs = stmt.executeQuery(sb2.toString());
+			List<Event> eventAssistList = new ArrayList<>();
+			while (rs.next()) {
+				Event event = new Event();
+				event.setEventId(rs.getInt("id"));
+				System.out.println("Eventid Assist: " + event.getEventId());
+				eventAssistList.add(event);
+			}
+			if (eventAssistList.size() == 0)
+				throw new WebApplicationException(Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(APIErrorBuilder.buildError(
+								Response.Status.NOT_FOUND.getStatusCode(),
+								"No Event Assist List found.", request))
+						.build());
+			stmt.close();
+			connection.close();
+			return eventAssistList;
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
