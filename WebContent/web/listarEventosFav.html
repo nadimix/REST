@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title> Lista Eventos Favoritos | Colourmylife</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Le styles -->
+<link
+    href=" twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap.css"
+    rel="stylesheet">
+<style>
+body {
+    padding-top: 10px;
+}
+</style>
+<link
+    href="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap-responsive.css"
+    rel="stylesheet">
+
+<!-- Le fav and touch icons -->
+<link rel="shortcut icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72"
+    href="images/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114"
+    href="images/apple-touch-icon-114x114.png">
+</head>
+
+<body>
+<!-- We will create navbar here -->
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<!--navigation does here-->
+				<ul class="nav">
+					<li class="active"><a class="brand" href="home.html">Home</a></li>
+					<li><a href="config.html">Cuenta</a></li>
+					<li><a href="listarArtistasFollowed.html">Ver artistas seguidos</a></li>
+					<li><a href="listarEventosFav.html">Ver eventos favoritos</a></li>
+					<li><a href="buscarArtista.html">Buscar nuevos artistas</a></li>
+					<li><a href="#" id="salir4">Salir</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+    <!-- Títol + Subtítol -->
+    <div class="container">
+        <div class="row">
+            <div class="span6">
+                <h3>LISTA DE EVENTOS FAVORITOS</h3>
+                <br />
+            </div>
+        </div>
+       </div>
+        <div class="container content" id="listar-Eventos-fav">
+        <table class="table table-bordered" id="res-Eventos-fav">
+            <thead>
+                <tr>
+               	<th>EVENTO</th>
+				<th>ARTISTA</th>
+				<th>CIUDAD</th>
+				<th>PAIS</th>
+				<th>FECHA</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        </div>
+        
+        <!-- Aqui hacemos el pop up!! -->
+	<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">×</button>
+			<h3 id="myModalLabel">INFORMACION EVENTO</h3>
+		</div>
+		<div class="modal-body">
+			<table class="table  table-bordered" id="tinfo1">
+				<tbody>
+					<tr>
+						<td class="right"><b>Artista del evento</b></td>
+						<td id="tdartist1"></td>
+					</tr>
+					<tr>
+						<td class="right"><b>Lugar</b></td>
+						<td id="tdplace1"></td>
+					</tr>
+					<tr>
+						<td class="right"><b>Ciudad</b></td>
+						<td id="tdcity1"></td>
+					</tr>
+						<tr>
+						<td class="right"><b>Fecha</b></td>
+						<td id="tddate1"></td>
+					</tr>
+					<tr>
+						<td class="right"><b>Información</b></td>
+						<td id="tdinfo1"></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="row">
+				<form class="well3 span2" id="unfav-event1">
+					<button type="submit" class="btn btn-custom" id="unfavevent1">
+						Desmarcar</button>
+				</form>
+			</div>
+		</div>
+	</div>
+    
+    <!-- SCRIPTS -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/jquery.jsonp-2.4.0.min.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/bootbox.min.js"></script>
+<script type="text/javascript" src="js/api.js"></script>
+<script type="text/javascript" src="js/listarEventosFav.js"></script>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../assets/js/jquery.js"></script>
+    <script src="../assets/js/bootstrap-transition.js"></script>
+    <script src="../assets/js/bootstrap-alert.js"></script>
+    <script src="../assets/js/bootstrap-modal.js"></script>
+    <script src="../assets/js/bootstrap-dropdown.js"></script>
+    <script src="../assets/js/bootstrap-scrollspy.js"></script>
+    <script src="../assets/js/bootstrap-tab.js"></script>
+    <script src="../assets/js/bootstrap-tooltip.js"></script>
+    <script src="../assets/js/bootstrap-popover.js"></script>
+    <script src="../assets/js/bootstrap-button.js"></script>
+    <script src="../assets/js/bootstrap-collapse.js"></script>
+    <script src="../assets/js/bootstrap-carousel.js"></script>
+    <script src="../assets/js/bootstrap-typeahead.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title> Admin | Colourmylife</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Le styles -->
+<link
+    href=" twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap.css"
+    rel="stylesheet">
+<style>
+body {
+    padding-top: 10px;
+    /* 60px to make the container go all the way to the */
+}
+</style>
+<link
+    href="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap-responsive.css"
+    rel="stylesheet">
+
+<!-- Le fav and touch icons -->
+<link rel="shortcut icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72"
+    href="images/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114"
+    href="images/apple-touch-icon-114x114.png">
+</head>
+
+<body>
+    <!-- Títol + Subtítol -->
+    <div class="container">
+        <div class="row">
+            <div class="span12">
+                <h2>PÁGINA DE ADMINISTRACIÓN</h2>
+                <h3>FUNCIONES DEL ADMINISTRADOR</h3>
+                <br />
+            </div>
+        </div>
+
+        <!-- Llistar usuaris -->
+        <div class="row">
+            <div class="span5">
+                <h4>
+                    - Listar usuarios <a href="listarUsuarios.html"title ""> aquí </a>
+                </h4>
+                <br />
+            </div>
+
+        <!-- Llistar artistas -->
+            <div class="span5">
+                <h4>
+                    - Listar artistas <a href="listarArtistas.html"title ""> aquí </a>
+                </h4>
+                <br />
+            </div>
+        </div> 
+
+        <!-- Añadir Artista -->
+        <div class="row">
+            <div class="span5">
+                <h4>- Añadir Artista</h4>
+                <br/>
+                <form class="well3 span3" id="list-Artista">
+                    <input class="span3" type="text" placeholder="Nombre artista"
+                        id="nombreArtista" required>
+                    <input class="span3" type="text" placeholder="ID género"
+                        id="genero1Artista" required>
+                    <input class="span3" type="text" placeholder="ID género"
+                        id="genero2Artista" >
+                      <input class="span3" type="text" placeholder="Informacion del Artista"
+                        id="infoArtista" required>
+                    <button type="submit" class="btn btn-custom pull-right" id="añadirArtista">Añadir Artista
+                    </button>
+                </form>
+            </div>
+
+        <!-- Elilminar usuario -->
+            <div class="span5">
+                <h4>- Eliminar usuario</h4>
+                <br />
+                <form class="well3 span3" id="eliminar-Usuario">
+                    <input class="span3" type="text" placeholder="Nombre usuario"
+                        id="nombreUsuario" required>
+                    <button type="submit" class="btn btn-custom pull-right" id="eliminarUsuario">Eliminar Usuario
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Elilminar artista -->
+        <div class="row">
+            <div class="span5">
+                <h4>- Eliminar Artista</h4>
+                <br />
+                <form class="well3 span3" id="eliminar-Artista">
+                    <input class="span3" type="text" placeholder="Nombre artista"
+                        id="nombre-Artista" required>
+                    <button type="submit" class="btn btn-custom pull-right" id="eliminarArtista">Eliminar Artista
+                    </button>
+                </form>
+            </div>
+
+        <!-- Elilminar Evento -->
+            <div class="span5">
+                <h4>- Eliminar Evento</h4>
+                <br/>
+                <form class="well3 span3" id="eliminar-Evento">
+                    <input class="span3" type="text" placeholder="ID evento"
+                        id="idevento" required>
+                     <input class="span3" type="text" placeholder="Nombre del Artista"
+                        id="nombreartista" required>
+                    <button type="submit" class="btn btn-custom pull-right" id="eliminarEvento">Eliminar Evento
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Añadir Evento -->
+        <div class="row">
+            <div class="span5">
+                <h4>- Añadir Evento</h4>
+                <br/>
+                <form class="well3 span3" id="insert-Evento">
+                    <input class="span3" type="text" placeholder="ID tipo de evento"
+                        id="tipo-Evento" required>
+                    <input class="span3" type="text" placeholder="Nombre artista"
+                        id="nombre-Artista1" required>
+                    <input class="span3" type="text" placeholder="Ciudad"
+                        id="ciudad-Evento" required>
+                    <input class="span3" type="text" placeholder="Lugar (local o sitio)"
+                        id="lugar-Evento" required>
+                    <input class="span3" type="text" placeholder="Pais"
+                        id="pais-Evento" required>
+                    <input class="span3" type="text" placeholder="Información adicional"
+                        id="info-Evento" required>
+                    <input class="span3" type="text" placeholder="Fecha"
+                        id="fecha-Evento" required>
+                    <button type="submit" class="btn btn-custom pull-right" id="añadirEvento">Añadir Evento
+                    </button>
+                </form>
+            </div>
+
+        <!-- Modificar evento -->
+            <div class="span5">
+                <h4>- Modificar Evento</h4>
+                <br />
+                <form class="well3 span3" id="modificar-Evento">
+                    <input class="span3" type="text" placeholder="ID del evento que quieres modificar"
+                        id="idEvento" required>
+                    <input class="span3" type="text" placeholder="Nombre del artista del evento"
+                        id="nombreArtista1" required>
+                    <input class="span3" type="text" placeholder="Ciudad"
+                        id="ciudadEvento" required>
+                    <input class="span3" type="text" placeholder="Lugar (local o sitio)"
+                        id="lugarEvento" required>
+                    <input class="span3" type="text" placeholder="Pais"
+                        id="paisEvento" required>
+                    <input class="span3" type="text" placeholder="Información adicional"
+                        id="infoEvento" required>
+                    <input class="span3" type="text" placeholder="Fecha"
+                        id="fechaEvento" required>
+                    <button type="submit" class="btn btn-custom pull-right" id="modificarEvento">Modificar Evento
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+  <!-- SCRIPTS -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/jquery.jsonp-2.4.0.min.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/bootbox.min.js"></script>
+<script type="text/javascript" src="js/api.js"></script>
+<script type="text/javascript" src="js/admin.js"></script>
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../assets/js/bootstrap-transition.js"></script>
+    <script src="../assets/js/bootstrap-alert.js"></script>
+    <script src="../assets/js/bootstrap-modal.js"></script>
+    <script src="../assets/js/bootstrap-dropdown.js"></script>
+    <script src="../assets/js/bootstrap-scrollspy.js"></script>
+    <script src="../assets/js/bootstrap-tab.js"></script>
+    <script src="../assets/js/bootstrap-tooltip.js"></script>
+    <script src="../assets/js/bootstrap-popover.js"></script>
+    <script src="../assets/js/bootstrap-button.js"></script>
+    <script src="../assets/js/bootstrap-collapse.js"></script>
+    <script src="../assets/js/bootstrap-carousel.js"></script>
+    <script src="../assets/js/bootstrap-typeahead.js"></script>
+</body>
+</html>

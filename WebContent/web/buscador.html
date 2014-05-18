@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Buscador | Colourmylife</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link rel="stylesheet"
+	href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link href=" twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the */bottom of the topbar
+      }
+    </style>
+    <link href="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+    <!-- We will create navbar here -->
+    <div class="navbar navbar-fixed-top">  
+        <div class="navbar-inner">  
+            <div class="container">  
+                <!--navigation does here-->
+                <ul class="nav">  
+                   <li class="active"><a class="brand" href="home.html">Home</a></li>
+					<li><a href="#" id="salir5">Salir</a></li>
+                  
+                </ul>
+            </div>  
+         </div>  
+    </div>   
+
+    <!-- TÍTOL -->
+    <div class="container">
+        <div class="row">
+            <div class="span6">
+                <h1>COLOUR MY LIFE</h1>
+                <h3>A Music Diary</h3>
+                <blockquote>
+                <p class="text-right">Music gives wings to the mind.</p>
+                </blockquote>
+                <br/>
+                <br/>
+                <h2>Bienvenido!</h2>
+                <h4>¿Empezamos buscando un artista.. ?</h4>
+            </div>
+            <div class="span12">
+                <br/>
+                <br/>
+                <h4>Buscar artistas: </h4>
+                <form class="well4 form-search" id="buscar-Artista2">
+					<div class="ui-widget">
+						<input id="nombre-Artista2" />
+						<button type="submit" class="btn">
+							<i class="icon-search" id="boton-busqueda"></i>
+						</button>
+					</div>
+				</form>
+			</div>
+ 
+        <div class="container content" id="listaArtistaGenero">
+            <table class="table table-bordered" id="resArtista2">
+                <thead>
+                    <tr>
+                    <th>ARTISTA</th>
+                    <th>GÉNERO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <br/>
+    </div>
+
+        <!-- IMATGES ARTISTES -->
+        <div class="row">  
+        <div class="span1">  
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/af.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">   
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/am.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/oasis.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/xx.jpeg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/m832.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/aj.jpeg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/m831.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/oasis2.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/be.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/cold.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/1.jpeg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/2.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/3.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/4.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/5.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/6.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/7.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/8.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/9.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/10.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/11.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/12.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/13.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/14.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/15.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/16.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/17.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/18.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/19.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/20.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/21.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/22.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/23.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/24.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/25.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+        <div class="span1">
+        <p><img src="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/img/artists/26.jpg" width="50" height="49" alt="GPlus logo" /></p>
+        </div>
+
+
+	   <!-- SCRIPTS -->
+	   
+	   
+	   <!-- PRUEBA -->
+	   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+			<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+			<script>
+				$(function() {
+					var availableTags = [ "Daft Punk", "Manolo Escobar", "Florence",
+							"Arcade Fire", "Coldplay", "Madonna", "Pitbull",
+							"The XX", "David Bisbal", "Robbie Williams",
+							"Coldplay", "Jennifer Lopez", "Little Mix",
+							"Shakira", "Alt J", "Michael Jackson",
+							"Vetusta Morla", "M-Clan", "Bob Marley","Lana del Rey", "Frank Sinatra" ];
+					$("#nombre-Artista2").autocomplete({
+						source : availableTags
+					});
+				});
+			</script>
+			
+
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/jquery.jsonp-2.4.0.min.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/bootbox.min.js"></script>
+<script type="text/javascript" src="js/api.js"></script>
+<script type="text/javascript" src="js/buscador.js"></script>
+    
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../assets/js/bootstrap-transition.js"></script>
+    <script src="../assets/js/bootstrap-alert.js"></script>
+    <script src="../assets/js/bootstrap-modal.js"></script>
+    <script src="../assets/js/bootstrap-dropdown.js"></script>
+    <script src="../assets/js/bootstrap-scrollspy.js"></script>
+    <script src="../assets/js/bootstrap-tab.js"></script>
+    <script src="../assets/js/bootstrap-tooltip.js"></script>
+    <script src="../assets/js/bootstrap-popover.js"></script>
+    <script src="../assets/js/bootstrap-button.js"></script>
+    <script src="../assets/js/bootstrap-collapse.js"></script>
+    <script src="../assets/js/bootstrap-carousel.js"></script>
+    <script src="../assets/js/bootstrap-typeahead.js"></script>
+  </body>
+</html>

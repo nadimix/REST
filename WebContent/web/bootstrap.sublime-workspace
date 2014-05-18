@@ -1,0 +1,924 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"username",
+				"usernameExists"
+			],
+			[
+				"register",
+				"register-form"
+			],
+			[
+				"fr",
+				"frame_display_n"
+			],
+			[
+				"by",
+				"bytessent_"
+			],
+			[
+				"in",
+				"instance"
+			],
+			[
+				"byte",
+				"bytessent_"
+			],
+			[
+				"OM",
+				"OMCastFileSender"
+			],
+			[
+				"bytes",
+				"bytesrcv"
+			],
+			[
+				"ms",
+				"msgsize_"
+			],
+			[
+				"num",
+				"numsenders_"
+			],
+			[
+				"i",
+				"instance"
+			],
+			[
+				"udp1",
+				"udp1_4"
+			],
+			[
+				"se",
+				"seqno_"
+			],
+			[
+				"sta",
+				"status_"
+			],
+			[
+				"ts",
+				"tslast"
+			],
+			[
+				"omcf",
+				"omcfilesr1"
+			],
+			[
+				"om",
+				"omcfilesr1"
+			],
+			[
+				"packet",
+				"packetCount"
+			],
+			[
+				"n",
+				"nbytes"
+			],
+			[
+				"O",
+				"OMCastFileSender"
+			],
+			[
+				"attac",
+				"attach-agent"
+			],
+			[
+				"frame",
+				"frame_number"
+			],
+			[
+				"si",
+				"size_"
+			],
+			[
+				"d",
+				"display_idx"
+			],
+			[
+				"Vide",
+				"VideoData"
+			],
+			[
+				"c",
+				"children"
+			],
+			[
+				"vp",
+				"vp2proot"
+			],
+			[
+				"fps",
+				"fps_"
+			],
+			[
+				"Video",
+				"VideoTrace"
+			],
+			[
+				"tra",
+				"trace_file_"
+			],
+			[
+				"int",
+				"interval"
+			],
+			[
+				"rec",
+				"recv_offset"
+			],
+			[
+				"APP",
+				"APP_P2P_ROOT"
+			],
+			[
+				"root",
+				"rootAddr"
+			],
+			[
+				"APP_P",
+				"APP_P2P_NODE"
+			],
+			[
+				"clie",
+				"clientAddr"
+			],
+			[
+				"uniq",
+				"uniqueId"
+			],
+			[
+				"roo",
+				"rootPtr"
+			],
+			[
+				"appD",
+				"appData"
+			],
+			[
+				"ro",
+				"rootPtr"
+			],
+			[
+				"AppR",
+				"AppP2PRootScheduleNextPacket"
+			],
+			[
+				"GLOMO_M",
+				"GLOMO_MsgSend"
+			],
+			[
+				"timer",
+				"timer"
+			],
+			[
+				"r",
+				"rootPtr"
+			],
+			[
+				"GLOMO",
+				"GLOMO_MsgReturnInfo"
+			],
+			[
+				"tim",
+				"timerMsg"
+			],
+			[
+				"GLOMO_Ms",
+				"GLOMO_MsgInfoAlloc"
+			],
+			[
+				"GL",
+				"GLOMO_APP_LAYER"
+			],
+			[
+				"ti",
+				"timerMsg"
+			],
+			[
+				"App",
+				"AppTimer"
+			],
+			[
+				"Glo",
+				"GlomoAppP2PRoot"
+			],
+			[
+				"de",
+				"default"
+			],
+			[
+				"AppP",
+				"AppP2PRootGetP2PRoot"
+			],
+			[
+				"a",
+				"appList"
+			],
+			[
+				"app",
+				"appNext"
+			],
+			[
+				"print",
+				"printf	printf …"
+			],
+			[
+				"GLOM",
+				"GLOMO_MAX_STRING_LENGTH"
+			],
+			[
+				"clo",
+				"clockStr"
+			],
+			[
+				"un",
+				"uniqueId"
+			],
+			[
+				"interval",
+				"intervalStr"
+			],
+			[
+				"start",
+				"startTimeStr"
+			],
+			[
+				"interva",
+				"intervalStr"
+			],
+			[
+				"Glom",
+				"GlomoAppP2PRoot"
+			],
+			[
+				"node",
+				"nodePtr"
+			],
+			[
+				"size",
+				"sizeof"
+			],
+			[
+				"no",
+				"nodePtr"
+			],
+			[
+				"t",
+				"typedef"
+			],
+			[
+				"GLO",
+				"GLOMO_MAX_STRING_LENGTH"
+			],
+			[
+				"inp",
+				"inputStrings"
+			],
+			[
+				"NODE",
+				"NODE_ADDR"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "template.html",
+			"settings":
+			{
+				"buffer_size": 499,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "login.html",
+			"settings":
+			{
+				"buffer_size": 1531,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "guest.html",
+			"settings":
+			{
+				"buffer_size": 796,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "list-tasting-notes.html",
+			"settings":
+			{
+				"buffer_size": 2059,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/main.js",
+			"settings":
+			{
+				"buffer_size": 2156,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "register.html",
+			"settings":
+			{
+				"buffer_size": 2245,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/register.js",
+			"settings":
+			{
+				"buffer_size": 3945,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/api.js",
+			"settings":
+			{
+				"buffer_size": 1058,
+				"line_ending": "Unix",
+				"name": "var API_BASE_URL = \"http://127.0.0.1:8000/mus-serv"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 33.0,
+		"selected_items":
+		[
+			[
+				"s",
+				"Set Syntax: C"
+			],
+			[
+				"",
+				"Set Syntax: C"
+			]
+		],
+		"width": 392.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/sergio/bootstrap-tutorial/register.js",
+		"/home/sergio/.config/sublime-text-2/Packages/User/html5.sublime-snippet",
+		"/home/sergio/bootstrap-tutorial/grid-system.html",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcastvideo.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/video-trace/h264svctrace.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/video-trace/h264svctrace.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/trace/traffictrace.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tools/trafgen.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/example-video.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/trace-big-buck-bunny.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/video-trace/trace-big-buck-bunny.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/ping.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/resultsf-0-25-6.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcastf-0-25-6.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcastfile.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/timer-handler.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcastfile.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/resultsf-0-10-1.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcastf-0-10-1.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcl/lib/ns-default.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcp/tcp.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcp/tcp-sink.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/network-0-10.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/topology.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tools/trafgen.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcastvideo.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/apps/ping.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/out.txt",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcp/tcp.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/results-0-10-1.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcastv-0-10-1.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/agent.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcp/tcp-linux.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcp/tcp-linux.h",
+		"/home/sergio/dev/ns-allinone-2.35/gt-itm/src/ts.c",
+		"/home/sergio/dev/ns-allinone-2.35/gt-itm/src/itm.c",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/topology",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/video-trace/topo",
+		"/home/sergio/idea-IU-123.94/bin/idea.sh",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/topology-0.alt",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/topology-0.gb",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/example-2.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/video-trace/example-vt.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p-backup/video-trace.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p-backup/video-trace.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/apps/udp.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/apps/app.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p/video-trace.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p/video-trace.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/video-trace/backup",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/video-trace/out.nam",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/network-200.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/network-100.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcastf-100-1.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/results-100-1.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/ping-10.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/ping-0.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/results-10-5.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/murtt_10",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/network-10.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/results.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/omcast-file.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/test-network.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/test-ping.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/e2ed",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/topology-0.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/example-topology.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/test.ts",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/example.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/agent.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcp/tcp-full.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/vp2p_agent.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/example2.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/topology-1.alt",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/ts100",
+		"/home/sergio/Descargas/ts100.txt",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/topology-1.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/topology-2.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcp/tcp-sink.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcl/lib/ns-source.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/ns-process.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/apps/app.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/misc.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcl/lib/ns-nix.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/omcast/algo.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/gen/ns_tcl.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/baytcp/ftpc.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/trace/trace.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p/dgp2p.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/packet.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p/video.dat",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p/trace.txt",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/connector.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/webcache/http-aux.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/ip.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/ns-process.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/packet.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p/example-2.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p/example-dgp2p.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/dg-vp2p/video_trace_H263.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/webcache/tcpapp.cc",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/vanet.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/vp2p_agent.h",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/Makefile",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/tcl/ex/trace-driven.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/sim 1000x1000/ns-4-3/vanet-4-3-28.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/rap/media-app.cc",
+		"/home/sergio/.cache/.fr-SbtY0n/MyAgent.cc",
+		"/home/sergio/.cache/.fr-IYGcNX/MyAgent.cc",
+		"/home/sergio/dev/test-gtitm/ts200",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-17.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-16.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-10.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vanet-3-2-46.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-11.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-12.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-13.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-14.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-15.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/launcher.c",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-0.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-1.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-5.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-4.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vanet-3-2-1.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vp2p-3-2-2.tr",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/extensions/ns-3-2/vanet-3-2-0.tcl",
+		"/home/sergio/dev/ns-allinone-2.35/ns-2.35/common/node.cc"
+	],
+	"find":
+	{
+		"height": 63.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"ndx",
+			"MWS",
+			"wnd_",
+			"ssthresh_",
+			"recv",
+			"[new Agent/TCP/Linux]",
+			"[new Agent/TCPSink/Sack1]",
+			"cwnd_",
+			"syn_",
+			"$n(72)",
+			"$n(2)",
+			"$n(72)",
+			"initial_window()",
+			"syn",
+			"$n(31)",
+			"$n(17)",
+			"$(n17)",
+			"[new Agent/TCPSink]",
+			"[new Agent/TCP]",
+			"bytesrcv",
+			"recv",
+			"rec",
+			"recvBytes",
+			"app_",
+			"[new Agent/TCP/Linux]",
+			"[new Agent/TCPSink/Sack1]",
+			"windowOp",
+			"sendmsg",
+			"send(",
+			"send",
+			"transtub",
+			"sendmsg",
+			"sendm",
+			"status",
+			"init",
+			"size_",
+			"size",
+			"packetsi",
+			"packets",
+			"300",
+			"sendms",
+			"send_mes",
+			"send_helper",
+			"send_much",
+			"maxburst_",
+			"send(",
+			"addr(",
+			"ack(",
+			"ack",
+			"app_",
+			"recvBytes",
+			"app",
+			"app_",
+			"enableRecv_",
+			"app_",
+			"recvBytes",
+			"seqno",
+			"SAM",
+			"attachApp",
+			"app_",
+			");\n",
+			"free",
+			"send",
+			"frame_number",
+			"targe",
+			"target_",
+			"agent_add",
+			"initpkt",
+			"running",
+			"VideoTrace",
+			"VideoTraceClass",
+			"sendmsg",
+			"vp2",
+			"n",
+			"queue",
+			"RTSThreshold",
+			"RTSThreshold_",
+			"backoff",
+			"bytes_",
+			"blocked_",
+			"checkQue",
+			"mac_->cw",
+			"MAC_MIBExt",
+			"macmib_",
+			"mac_->cw",
+			"mac",
+			"CWMIN"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"[new Agent/TCP]",
+			"[new Agent/TCPSink]",
+			"[new Agent/TCPSink/Sack1]",
+			"[new Agent/TCP/Linux]",
+			"[new Agent/TCP]",
+			"[new Agent/TCPSink]"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "template.html",
+					"settings":
+					{
+						"buffer_size": 499,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "login.html",
+					"settings":
+					{
+						"buffer_size": 1531,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								961,
+								961
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 51.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "guest.html",
+					"settings":
+					{
+						"buffer_size": 796,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								436,
+								436
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 51.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "list-tasting-notes.html",
+					"settings":
+					{
+						"buffer_size": 2059,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								956,
+								956
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 51.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "js/main.js",
+					"settings":
+					{
+						"buffer_size": 2156,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								764,
+								764
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "register.html",
+					"settings":
+					{
+						"buffer_size": 2245,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2228,
+								2228
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 272.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "js/register.js",
+					"settings":
+					{
+						"buffer_size": 3945,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3945,
+								3945
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1734.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "js/api.js",
+					"settings":
+					{
+						"buffer_size": 1058,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								20,
+								20
+							]
+						],
+						"settings":
+						{
+							"auto_name": "var API_BASE_URL = \"http://127.0.0.1:8000/mus-serv",
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 178.0,
+	"status_bar_visible": true
+}

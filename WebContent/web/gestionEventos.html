@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gestión Eventos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Le styles -->
+<link
+	href=" twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap.css"
+	rel="stylesheet">
+<style>
+body {
+	padding-top: 10px;
+	/* 60px to make the container go all the way to the */
+}
+</style>
+<link
+	href="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap-responsive.css"
+	rel="stylesheet">
+
+<!-- Le fav and touch icons -->
+<link rel="shortcut icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72"
+	href="images/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114"
+	href="images/apple-touch-icon-114x114.png">
+</head>
+<body>
+	<!-- We will create navbar here -->
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<!--navigation does here-->
+				<ul class="nav">
+					<li class="active"><a class="brand" href="">Administrador</a></li>
+					<li><a href="gestionArtistas.html">Artistas</a></li>
+					<li><a href="gestionUsuarios.html">Usuarios</a></li>
+					<li><a href="gestionEventos.html">Eventos</a></li>
+					<li><a href="#" id="salirEventos">Salir</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- Títol + Subtítol -->
+	<div class="container">
+		<div class="row">
+			<div class="span12">
+				<h2>PÁGINA DE ADMINISTRACIÓN</h2>
+				<h3>FUNCIONES DEL ADMINISTRADOR</h3>
+				<h4>GESTIÓN DE EVENTOS</h4>
+				<br />
+			</div>
+		</div>
+	</div>
+
+	<!-- Añadir Evento -->
+	<div class="span12">
+		<form class="well span3" id="insert-Evento">
+			<Legend> Añadir Evento</Legend>
+			<label class="control-label"
+				for="multiSelect">Seleccionar Tipo de Evento</label> <select
+				class="span2" id="multiSelect">
+				<option value='1'>Concierto</option>
+				<option value='2'>Nuevo Álbum</option>
+				<option value='3'>Nuevo Videoclip</option>
+			</select> <label class="control-label" for="multiSelect">Fecha y Hora</label>
+			<div id="datetimepicker" class="input-append date">
+				<input class="span2" type="text" id="data"></input> <span class="add-on"> <i
+					data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+				</span>
+			</div>
+			<label>Nombre Artista</label> <input type="text" class="span3"
+				id="nombre-Artista1"> <label>Ciudad</label> <input
+				type="text" class="span3" id="ciudad-Evento"> <label>Lugar
+				(local o sitio)</label> <input type="text" class="span3" id="lugar-Evento1">
+				<label>Pais</label>
+			<input type="text" class="span3" id="pais-Evento" onblur="localizar2()"> 
+			<label>Información Adicional</label>
+			<textarea class="span3" id="info-Evento" rows="3"></textarea>
+			<button type="submit" class="btn btn-custom pull-right">Añadir
+				Evento</button>
+		</form>
+
+		<!-- Modificar Evento -->
+		<form class="well span3" id="modificar-Evento">
+			<Legend> Modificar Evento</Legend>
+			<label>ID del Evento</label> <input class="span3" type="text"
+				id="idevento2" required> <label>Nombre del artista
+				del evento</label> <input class="span3" type="text" id="nombreartista1"
+				required> <label class="control-label" for="multiSelect">Fecha
+				y Hora</label>
+			<div id="datetimepicker2" class="input-append date">
+				<input type="text" id="data2"></input> <span class="add-on">
+					<i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+				</span>
+			</div>
+			<label>Ciudad</label> <input class="span3" type="text"
+				id="ciudadEvento2" required> <label>Lugar (local o
+				sitio)</label> <input class="span3" type="text" id="lugarEvento" required>
+			<label>Pais</label> <input class="span3" type="text" id="paisEvento"
+				onblur="localizar()" required><label
+				class="control-label" for="textarea">Información Adicional</label>
+			<textarea class="span3" id="infoEvento" rows="3"></textarea>
+			<button type="submit" class="btn btn-custom pull-right">Modificar
+				Evento</button>
+		</form>
+
+		<!-- Eliminar Evento -->
+		<form class="well span3" id="eliminar-Evento">
+			<legend> Eliminar Evento</legend>
+			<input class="span3" type="text" placeholder="ID evento"
+				id="idevento" required> <input class="span3" type="text"
+				placeholder="Nombre del Artista" id="nombreartista" required>
+			<button type="submit" class="btn btn-custom pull-right"
+				id="eliminarEvento">Eliminar Evento</button>
+		</form>
+		<div id="pony"
+			style="margin-top: 200px; margin-left: 720px; width: 290px; height: 290px;"></div>
+	</div>
+
+	<!-- SCRIPTS -->
+
+	<script type="text/javascript"
+		src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js">
+		
+	</script>
+	<script type="text/javascript"
+		src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js">
+		
+	</script>
+	<script type="text/javascript"
+		src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js">
+		
+	</script>
+			<script type="text/javascript">
+		$('#datetimepicker').datetimepicker({
+			format : 'dd/MM/yyyy hh:mm',
+			language : 'en'
+		});
+		$('#datetimepicker2').datetimepicker({
+			format : 'dd/MM/yyyy hh:mm',
+			language : 'en'
+		});
+	</script>
+	<script type="text/javascript"
+		src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.pt-BR.js">
+	</script>
+	<script type="text/javascript"
+		src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script type="text/javascript"
+		src="http://maps.google.com/maps/api/js?sensor=true"></script>
+	<script type="text/javascript"
+		src="https://raw.github.com/HPNeo/gmaps/master/gmaps.js"></script>
+
+	<script
+		src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script
+		src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/jquery.jsonp-2.4.0.min.js"></script>
+	<script src="js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/bootbox.min.js"></script>
+	<script type="text/javascript" src="js/api.js"></script>
+	<script type="text/javascript" src="js/gestionEventos.js"></script>
+	<!-- Le javascript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="../assets/js/bootstrap-transition.js"></script>
+	<script src="../assets/js/bootstrap-alert.js"></script>
+	<script src="../assets/js/bootstrap-modal.js"></script>
+	<script src="../assets/js/bootstrap-dropdown.js"></script>
+	<script src="../assets/js/bootstrap-scrollspy.js"></script>
+	<script src="../assets/js/bootstrap-tab.js"></script>
+	<script src="../assets/js/bootstrap-tooltip.js"></script>
+	<script src="../assets/js/bootstrap-popover.js"></script>
+	<script src="../assets/js/bootstrap-button.js"></script>
+	<script src="../assets/js/bootstrap-collapse.js"></script>
+	<script src="../assets/js/bootstrap-carousel.js"></script>
+	<script src="../assets/js/bootstrap-typeahead.js"></script>
+	<script src="../assets/js/bootstrap-twipsy.js"></script>
+	<!--<script type="text/javascript">
+		$('#datetimepicker').datetimepicker({
+			format : 'dd/MM/yyyy hh:mm',
+			language : 'en'
+		});
+	</script>
+	<script type="text/javascript">
+		$('#datetimepicker2').datetimepicker({
+			format : 'dd/MM/yyyy hh:mm',
+			language : 'en'
+		});
+	</script>-->
+</body>
+</html>

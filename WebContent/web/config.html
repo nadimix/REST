@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Configuración | Colourmylife</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Le styles -->
+<link
+	href=" twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap.css"
+	rel="stylesheet">
+<style>
+body {
+	padding-top: 60px;
+	/* 60px to make the container go all the way to the */
+	bottom
+	of
+	the
+	topbar
+}
+</style>
+<link
+	href="twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap-responsive.css"
+	rel="stylesheet">
+
+<!-- Le fav and touch icons -->
+<link rel="shortcut icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72"
+	href="images/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114"
+	href="images/apple-touch-icon-114x114.png">
+</head>
+
+<body>
+
+	<!-- We will create navbar here -->
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<!--navigation does here-->
+				<ul class="nav">
+					<li class="active"><a class="brand" href="home.html">Home</a></li>
+					<li><a href="config.html">Cuenta</a></li>
+					<li><a href="listarArtistasFollowed.html">Ver artistas
+							seguidos</a></li>
+					<li><a href="listarEventosFav.html">Ver eventos favoritos</a></li>
+					<li><a href="buscarArtista.html">Buscar nuevos artistas</a></li>
+					<li><a href="#" id="salir">Salir</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- Títol + Subtítol -->
+	<div class="container">
+		<div class="row">
+			<div class="span6">
+				<h1>COLOUR MY LIFE</h1>
+				<h3>A Music Diary</h3>
+				<blockquote>
+					<p class="text-right">Music gives wings to the mind.</p>
+					<br />
+				</blockquote>
+			</div>
+		</div>
+
+		<!-- Secció -->
+		<div class="row">
+			<div class="span12">
+				<h3>Configuración de tu cuenta</h3>
+				<br />
+			</div>
+		</div>
+
+		<!-- Taula contingut -->
+		<div class="container content" id="listaDatosUsuarios">
+			<table class="table table-bordered span6" id="resUsuario">
+				<legend>Datos Cuenta</legend>
+				<thead>
+					<tr>
+						<th>Usuario</th>
+						<th>Nombre</th>
+						<th>Correo</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+
+			<!-- Opcions de canvi table table-hover table-condensed-->
+			<form class="well span3" id="modificarDatos">
+				<legend>Modificar tus datos</legend>
+				<input class="span3" type="text" placeholder="Nombre" id="nombre"
+					required> <input class="span3" type="text"
+					placeholder="Correo nuevo" id="email" required> <input
+					class="span3" type="password" placeholder="Contraseña nueva"
+					id="passw" required>
+				<button type="submit" class="btn btn-custom" id="modificar">
+					¡Modificar!</button>
+			</form>
+		</div>
+
+		<form class="well3 span3" id="eliminarCuenta">
+		<legend>Eliminar Cuenta</legend>
+			<button type="submit" class="btn btn-custom" id="eliminar">
+				Eliminar</button>
+		</form>
+
+		<!-- SCRIPTS -->
+		<script
+			src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script
+			src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/jquery.jsonp-2.4.0.min.js"></script>
+		<script src="js/jquery.cookie.js"></script>
+		<script type="text/javascript" src="js/bootbox.min.js"></script>
+		<script type="text/javascript" src="js/api.js"></script>
+		<script type="text/javascript" src="js/config.js"></script>
+
+		<!-- Le javascript
+    ================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="../assets/js/jquery.js"></script>
+		<script src="../assets/js/bootstrap-transition.js"></script>
+		<script src="../assets/js/bootstrap-alert.js"></script>
+		<script src="../assets/js/bootstrap-modal.js"></script>
+		<script src="../assets/js/bootstrap-dropdown.js"></script>
+		<script src="../assets/js/bootstrap-scrollspy.js"></script>
+		<script src="../assets/js/bootstrap-tab.js"></script>
+		<script src="../assets/js/bootstrap-tooltip.js"></script>
+		<script src="../assets/js/bootstrap-popover.js"></script>
+		<script src="../assets/js/bootstrap-button.js"></script>
+		<script src="../assets/js/bootstrap-collapse.js"></script>
+		<script src="../assets/js/bootstrap-carousel.js"></script>
+		<script src="../assets/js/bootstrap-typeahead.js"></script>
+</body>
+</html>
